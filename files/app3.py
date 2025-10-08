@@ -327,6 +327,51 @@ def sidebar_navigationAdmin():
 
 # Main function to control the app flow
 def main():
+    import streamlit as st
+    import streamlit.components.v1 as components
+
+    # JavaScript to set a cookie in the browser
+    cookie_js = """
+        <script>
+        // Function to set a cookie in the browser
+        function setCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));  // Convert days to milliseconds
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";  // Set cookie for the entire domain
+        }
+
+        // Set a cookie named "user_session" with a value "12345" for 7 days
+        setCookie('user_session', '12345', 7);
+
+        // Get the cookie value for "user_session"
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0;i < ca.length;i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        }
+
+        // Retrieve the cookie value and pass it back to Streamlit
+        var cookieValue = getCookie('user_session');
+        window.parent.postMessage({type: 'cookie', data: cookieValue}, "*");
+        </script>
+    """
+
+    # Inject JavaScript into the page to set the cookie and retrieve its value
+    components.html(cookie_js, height=0)
+
+    # Display a message in the app
+    st.write("Cookie 'user_session' has been set in the browser. It will expire in 7 days.")
+
+
     st.markdown("""
     <style>
     div.stButton > button:first-child {
