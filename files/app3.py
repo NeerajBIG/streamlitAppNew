@@ -10,6 +10,7 @@ from email.mime.multipart import MIMEMultipart
 from files.mySQLConnector import MySQLDatabase
 import re
 import pandas as pd
+from datetime import datetime
 
 
 db = MySQLDatabase(
@@ -108,6 +109,27 @@ def signup():
                 st.error("This email address is already registered.", icon="🚨")
             db.close()
 
+def set_cookie_js(cookie_value):
+    # JavaScript to set the cookie with the new user session
+    cookie_js = f"""
+    <script>
+    // Function to set a cookie
+    function setCookie(name, value, days) {{
+        var expires = "";
+        if (days) {{
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));  // Convert days to milliseconds
+            expires = "; expires=" + date.toUTCString();
+        }}
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";  // Set cookie for the entire domain
+    }}
+
+    // Set the new user session cookie
+    setCookie('user_session', '{cookie_value}', 7);  // 7 days expiration
+    </script>
+    """
+    #components.html(cookie_js, height=0)
+
 # Login logic
 def login():
     st.title("Login")
@@ -152,6 +174,26 @@ def login():
                 st.session_state.user_name = result[0]['name']
                 st.session_state.user_role = result[0]['role']
 
+                current_datetime = datetime.now()
+                print(current_datetime)
+                insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
+                insert_params = (result[0]['id'], '1', current_datetime)
+                db.insert_data(insert_query, insert_params)
+
+                # SELECT query to verify data
+                select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
+                params = (result[0]['id'],)
+                result = db.fetch_data(select_query, params)
+                st.text(result)
+
+                if result not in st.session_state:
+                    st.session_state['LoggedUsers_value'] = result
+
+                    # Update the value
+                #st.session_state['my_value'] = 'new_value'
+
+
+
                 time.sleep(2)
                 st.rerun()
 
@@ -168,6 +210,7 @@ def show_homepageQA():
         st.title(f"Welcome, {st.session_state.user_name}!")
         st.write(f"Your Role: {st.session_state.user_role}")
         st.text(st.session_state)
+        st.write(f"Current value: {st.session_state['LoggedUsers_value']}")
     else:
         st.write("You need to log in first!")
 
@@ -327,50 +370,6 @@ def sidebar_navigationAdmin():
 
 # Main function to control the app flow
 def main():
-    import streamlit as st
-    import streamlit.components.v1 as components
-
-    # JavaScript to set a cookie in the browser
-    cookie_js = """
-        <script>
-        // Function to set a cookie in the browser
-        function setCookie(name, value, days) {
-            var expires = "";
-            if (days) {
-                var date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));  // Convert days to milliseconds
-                expires = "; expires=" + date.toUTCString();
-            }
-            document.cookie = name + "=" + (value || "") + expires + "; path=/";  // Set cookie for the entire domain
-        }
-
-        // Set a cookie named "user_session" with a value "12345" for 7 days
-        setCookie('user_session', '12345', 7);
-
-        // Get the cookie value for "user_session"
-        function getCookie(name) {
-            var nameEQ = name + "=";
-            var ca = document.cookie.split(';');
-            for(var i=0;i < ca.length;i++) {
-                var c = ca[i];
-                while (c.charAt(0) == ' ') c = c.substring(1,c.length);
-                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-            }
-            return null;
-        }
-
-        // Retrieve the cookie value and pass it back to Streamlit
-        var cookieValue = getCookie('user_session');
-        window.parent.postMessage({type: 'cookie', data: cookieValue}, "*");
-        </script>
-    """
-
-    # Inject JavaScript into the page to set the cookie and retrieve its value
-    components.html(cookie_js, height=0)
-
-    # Display a message in the app
-    st.write("Cookie 'user_session' has been set in the browser. It will expire in 7 days.")
-
 
     st.markdown("""
     <style>
