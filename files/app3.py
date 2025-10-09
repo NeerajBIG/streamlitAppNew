@@ -144,12 +144,6 @@ def login():
                 }
                 </style>""", unsafe_allow_html=True)
 
-    import extra_streamlit_components as stx
-
-    cookie_manager = stx.CookieManager(key=0)
-
-    cookie_manager.set("auth_token", email)
-    st.write(cookie_manager.get_all())
 
     if st.button("Login"):
         if not email or not password:
