@@ -11,6 +11,7 @@ from files.mySQLConnector import MySQLDatabase
 import re
 import pandas as pd
 from datetime import datetime
+from streamlit_session_browser_storage import SessionStorage
 
 
 db = MySQLDatabase(
@@ -207,10 +208,19 @@ def show_homepage():
 # Show homepage after login
 def show_homepageQA():
     if 'user_name' in st.session_state:
+        userNameFound = st.session_state.user_name
         st.title(f"Welcome, {st.session_state.user_name}!")
         st.write(f"Your Role: {st.session_state.user_role}")
         st.text(st.session_state)
         st.write(f"Current value: {st.session_state['LoggedUsers_value']}")
+
+        session_storage = SessionStorage()
+        data = session_storage.getItem("my_data")
+        if data is None:
+            data = {"name": "Guesta"}
+            session_storage.setItem("my_data", data)
+        session_storage.setItem("my_data", {"name": userNameFound})
+        st.write(session_storage.getItem("my_data"))
     else:
         st.write("You need to log in first!")
 
