@@ -4,3 +4,4 @@ streamlit-js-eval~=0.1.7
 GitPython~=3.1.45
 mysql-connector~=2.2.9
 streamlit-browser-session-storage~=0.0.12
+streamlit-cookies-controller~=0.0.4

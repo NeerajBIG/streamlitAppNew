@@ -11,7 +11,9 @@ from files.mySQLConnector import MySQLDatabase
 import re
 import pandas as pd
 from datetime import datetime
-from streamlit_session_browser_storage import SessionStorage
+from streamlit_cookies_controller import CookieController
+
+controller = CookieController()
 
 
 db = MySQLDatabase(
@@ -20,6 +22,7 @@ db = MySQLDatabase(
         password='mqgWHRyzR1',
         database='sql5801118'
 )
+user_data = {}
 
 # Send registration email
 def send_email(email, password):
@@ -110,26 +113,22 @@ def signup():
                 st.error("This email address is already registered.", icon="🚨")
             db.close()
 
-def set_cookie_js(cookie_value):
-    # JavaScript to set the cookie with the new user session
-    cookie_js = f"""
-    <script>
-    // Function to set a cookie
-    function setCookie(name, value, days) {{
-        var expires = "";
-        if (days) {{
-            var date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));  // Convert days to milliseconds
-            expires = "; expires=" + date.toUTCString();
-        }}
-        document.cookie = name + "=" + (value || "") + expires + "; path=/";  // Set cookie for the entire domain
-    }}
-
-    // Set the new user session cookie
-    setCookie('user_session', '{cookie_value}', 7);  // 7 days expiration
-    </script>
-    """
-    #components.html(cookie_js, height=0)
+# # Function to store session in browser storage for each user
+# def set_browser_session(user_data):
+#     # Get session storage object
+#     session_storage = SessionStorage()
+#
+#     # Store the user data as an array of sessions (if more than one user logs in)
+#     existing_sessions = session_storage.getItem("active_sessions")
+#
+#     if existing_sessions is None:
+#         existing_sessions = []
+#
+#     # Add the new user's session to the list
+#     existing_sessions.append(user_data)
+#
+#     # Save it back to session storage
+#     session_storage.setItem("active_sessions", existing_sessions)
 
 # Login logic
 def login():
@@ -144,6 +143,13 @@ def login():
                     color: white; /* Text color */
                 }
                 </style>""", unsafe_allow_html=True)
+
+    import extra_streamlit_components as stx
+
+    cookie_manager = stx.CookieManager(key=0)
+
+    cookie_manager.set("auth_token", email)
+    st.write(cookie_manager.get_all())
 
     if st.button("Login"):
         if not email or not password:
@@ -172,31 +178,26 @@ def login():
                 st.success(f"Login successful! Welcome back, {result[0]['name']}!")
 
                 # Storing the user's name and role in session state
-                st.session_state.user_name = result[0]['name']
-                st.session_state.user_role = result[0]['role']
+                # st.session_state.user_name = result[0]['name']
+                # st.session_state.user_role = result[0]['role']
 
                 current_datetime = datetime.now()
-                print(current_datetime)
+                st.text(current_datetime)
                 insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
                 insert_params = (result[0]['id'], '1', current_datetime)
                 db.insert_data(insert_query, insert_params)
 
-                # SELECT query to verify data
-                select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
-                params = (result[0]['id'],)
-                result = db.fetch_data(select_query, params)
-                st.text(result)
+                # # SELECT query to verify data
+                # select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
+                # params = (result[0]['id'],)
+                # result = db.fetch_data(select_query, params)
+                # st.text(result)
 
-                if result not in st.session_state:
-                    st.session_state['LoggedUsers_value'] = result
+                controller.set('cookie_name', 'testing')
+                cookie = controller.get('cookie_name')
+                st.write(cookie)
 
-                    # Update the value
-                #st.session_state['my_value'] = 'new_value'
-
-
-
-                time.sleep(2)
-                st.rerun()
+                #st.rerun()
 
             db.close()
 
@@ -211,16 +212,25 @@ def show_homepageQA():
         userNameFound = st.session_state.user_name
         st.title(f"Welcome, {st.session_state.user_name}!")
         st.write(f"Your Role: {st.session_state.user_role}")
-        st.text(st.session_state)
-        st.write(f"Current value: {st.session_state['LoggedUsers_value']}")
 
-        session_storage = SessionStorage()
-        data = session_storage.getItem("my_data")
-        if data is None:
-            data = {"name": "Guesta"}
-            session_storage.setItem("my_data", data)
-        session_storage.setItem("my_data", {"name": userNameFound})
-        st.write(session_storage.getItem("my_data"))
+        # set_browser_session(user_data)
+        # session_storage = SessionStorage()
+        # active_sessions = session_storage.getItem("active_sessions")
+        #
+        # if active_sessions:
+        #     # Display info for all active users
+        #     for session in active_sessions:
+        #         st.write(f"Logged in as: {session['name']} (Role: {session['role']})")
+        # else:
+        #     st.write("No active users found.")
+
+        # session_storage = SessionStorage()
+        # data = session_storage.getItem("my_data")
+        # if data is None:
+        #     data = {"name": "Guesta"}
+        #     session_storage.setItem("my_data", data)
+        # session_storage.setItem("my_data", {"name": userNameFound})
+        # st.write(session_storage.getItem("my_data"))
     else:
         st.write("You need to log in first!")
 
@@ -335,6 +345,7 @@ def sidebar_navigationQA():
     page = st.sidebar.radio("Choose a page", ["Home", "My Data"])
     if page == "Home":
         show_homepageQA()
+
     elif page == "My Data":
         st.text("Add a new page here for QA user")
 
