@@ -193,7 +193,7 @@ def login():
                 # result = db.fetch_data(select_query, params)
                 # st.text(result)
 
-                controller.set('cookie_name', 'testing')
+                controller.set('cookie_name', result[0]['email'])
                 cookie = controller.get('cookie_name')
                 st.write(cookie)
 
@@ -212,6 +212,9 @@ def show_homepageQA():
         userNameFound = st.session_state.user_name
         st.title(f"Welcome, {st.session_state.user_name}!")
         st.write(f"Your Role: {st.session_state.user_role}")
+
+        cookie = controller.get('cookie_name')
+        st.write(cookie)
 
         # set_browser_session(user_data)
         # session_storage = SessionStorage()
@@ -407,7 +410,7 @@ def main():
         st.session_state['user_name'] = 'Guest User'
 
     if st.session_state['user_role'] == 'Guest':
-        sidebar_navigation()
+        sidebar_navigationQA()
     elif st.session_state['user_role'] == 'QA':
         sidebar_navigationQA()
     elif st.session_state['user_role'] == 'Admin':
