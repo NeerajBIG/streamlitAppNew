@@ -507,7 +507,7 @@ def main():
     st.text(controller.get('cookie_name'))
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
-    elif controller.get('cookie_name') == 'gagan03091989@gmail.com':
+    elif controller.get('cookie_name') == 'QA':
         sidebar_navigationQA()
     elif controller.get('cookie_name') == 'Admin':
         sidebar_navigationAdmin()
