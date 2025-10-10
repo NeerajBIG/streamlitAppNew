@@ -513,7 +513,7 @@ def main():
     }
     </style>""", unsafe_allow_html=True)
 
-    st.text("test "+controller.get('cookie_name'))
+    st.text("testing "+ str(controller.get('cookie_name')))
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
     elif controller.get('cookie_name') == 'None':
