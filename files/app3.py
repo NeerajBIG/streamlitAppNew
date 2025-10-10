@@ -505,12 +505,7 @@ def main():
     }
     </style>""", unsafe_allow_html=True)
 
-    # # Ensure session state is initialized
-    # if 'user_role' not in st.session_state:
-    #     st.session_state['user_role'] = 'Guest'
-    # if 'user_name' not in st.session_state:
-    #     st.session_state['user_name'] = 'Guest User'
-
+    st.text(controller.get('cookie_name'))
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
     elif controller.get('cookie_name') == 'QA':
