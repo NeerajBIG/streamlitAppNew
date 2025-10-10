@@ -453,7 +453,6 @@ def sidebar_navigationQA():
         show_homepageQA()
     elif page == "Login":
         login()
-
     elif page == "My Data":
         st.text("Add a new page here for QA user")
 
@@ -508,7 +507,7 @@ def main():
     st.text(controller.get('cookie_name'))
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
-    elif controller.get('cookie_name') == 'QA':
+    elif controller.get('cookie_name') == 'gagan03091989@gmail.com':
         sidebar_navigationQA()
     elif controller.get('cookie_name') == 'Admin':
         sidebar_navigationAdmin()
