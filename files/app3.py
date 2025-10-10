@@ -24,14 +24,41 @@ db = MySQLDatabase(
 )
 user_data = {}
 
-# Send registration email
-def send_email(email, password):
-    sender_email = "teamqa59@gmail.com"  # Replace with your email
-    sender_password = "Gagan@0309"  # Replace with your email password
+# Send registration email to user
+def send_email_user(user, email, password):
+    sender_email = "neeraj1wayitsol@gmail.com"  # Replace with your email
+    sender_password = "gwgc ioef ymbx yybo"  # Replace with your email password
     recipient_email = email
 
     subject = "Registration Confirmation"
-    body = f"Hello, \n\nYour registration is successful! \n\nEmail: {email}\nPassword: {password}\n\nThank you for signing up."
+    body = f"Hello {user}, \n\nYour registration is successful! You will receive confirmation email once approved by admin. \n\n Your access details are as follows \n\nEmail: {email}\nPassword: {password}\nlink: https://bigauto.streamlit.app/\n\nThank you for signing up."
+
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    # Set up the server
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        text = msg.as_string()
+        server.sendmail(sender_email, recipient_email, text)
+        server.quit()
+    except Exception as e:
+        st.error(f"Error sending email: {e}")
+
+# Send registration email
+def send_email_admin(user, email, password):
+    sender_email = "neeraj1wayitsol@gmail.com"  # Replace with your email
+    sender_password = "gwgc ioef ymbx yybo"  # Replace with your email password
+    recipient_email = email
+
+    subject = "New Registration for approval"
+    body = f"Hello Admin, \n\n Someone just registered! Please confirm user's request. \n\n Link to admin portal is as follows \n\n link: https://bigauto.streamlit.app/\n\nThank you for signing up."
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
@@ -105,7 +132,7 @@ def signup():
                     st.success(f"Signup successful! You will receive confirmation email once approved by admin. Thanks {result[0]['name']}!")
 
                     st.text("Send Email to Admin")
-                    #send_email(email, password)  # Send registration email
+                    send_email_user(name, email, password)  # Send registration email
                     time.sleep(2)
 
                     st.rerun()
@@ -187,7 +214,7 @@ def login():
                 # result = db.fetch_data(select_query, params)
                 # st.text(result)
 
-                controller.set('cookie_name', result[0]['email'])
+                controller.set('cookie_name', result[0]['role'])
                 cookie = controller.get('cookie_name')
                 st.write(cookie)
 
@@ -197,15 +224,17 @@ def login():
 
 # Show homepage before login
 def show_homepage():
-    st.title(f"Hi, {st.session_state.user_name}!")
+    st.title(f"Hi, {controller.get('cookie_name')}!")
     st.write(f"Your are a guest user. Please signup to explore BIG automation tool.")
 
 # Show homepage after login
 def show_homepageQA():
-    if 'user_name' in st.session_state:
-        userNameFound = st.session_state.user_name
-        st.title(f"Welcome, {st.session_state.user_name}!")
-        st.write(f"Your Role: {st.session_state.user_role}")
+    if controller.get('cookie_name') == "QA":
+        userNameFound = controller.get('cookie_name')
+        st.title(f"Welcome, {controller.get('cookie_name')}!")
+        st.write(f"Your Role: {controller.get('cookie_name')}")
+
+        st.link_button("Go to W3Schools", "https://www.w3schools.com/")
 
         cookie = controller.get('cookie_name')
         st.write(cookie)
@@ -233,94 +262,174 @@ def show_homepageQA():
 
 # Show homepage after login by Admin
 def show_homepageAdmin():
-    if 'user_name' in st.session_state:
-        st.title(f"Welcome Admin, {st.session_state.user_name}!")
-        st.write(f"Your Role: {st.session_state.user_role}")
-        st.text(st.session_state)
+    if controller.get('cookie_name') == "Admin":
+        st.title(f"Welcome, {controller.get('cookie_name')}!")
+        st.write(f"Your Role: {controller.get('cookie_name')}")
     else:
         st.write("You need to log in first!")
 
 # Show users page after login by Admin
 def show_usersAdmin():
-    if 'user_name' in st.session_state:
-        st.text("Show table of all users here.")
+    if controller.get('cookie_name') == "Admin":
+        st.text("All User List")
         db.connect()
 
-        # SELECT query (fetching data)
-        select_query = "SELECT * FROM users WHERE verified = %s"
-        params = ("1",)
-        result = db.fetch_data(select_query, params)
+        option_1 = st.radio("Choose a user listing", ["All Active", "Pending Approval"])
+        if option_1 == "All Active":
+            # SELECT query (fetching data)
+            select_query = "SELECT * FROM users WHERE verified = %s"
+            params = ("1",)
+            result = db.fetch_data(select_query, params)
 
-        df = pd.DataFrame(result)
+            df = pd.DataFrame(result)
 
-        st.markdown("""
-            <style>
-                /* Make column headers bold */
-                .dataframe thead th {
-                    font-weight: bold !important;
-                    text-align: left !important;
-                }
-
-                /* Left-align text in the table cells */
-                .dataframe tbody tr th, .dataframe tbody tr td {
-                    text-align: left !important;
-                }
-
-                /* Make the dataframe scrollable horizontally if it overflows */
-                .stDataFrame div {
-                    overflow-x: auto !important;
-                }
-            </style>
-        """, unsafe_allow_html=True)
-
-        email_options = df['email'].tolist()  # Get all emails
-        email_options.insert(0, "Select")  # Add "Select" as the first option
-
-        selected_email = st.selectbox("Select an Email", email_options, key="email_selectbox")
-
-        if selected_email != "Select":
-
-            selected_row = df[df['email'] == selected_email].iloc[0]  # Get the row corresponding to the selected email
-            selected_id = selected_row['id']
-            selected_role = selected_row['role']
-
-            if selected_role != "Admin":
-                st.markdown("""
+            st.markdown("""
                 <style>
-                div.stButton > button:first-child {
-                    background-color: #FF0000; /* red color */
-                    color: white; /* Text color */
-                }
-                </style>""", unsafe_allow_html=True)
+                    /* Make column headers bold */
+                    .dataframe thead th {
+                        font-weight: bold !important;
+                        text-align: left !important;
+                    }
+    
+                    /* Left-align text in the table cells */
+                    .dataframe tbody tr th, .dataframe tbody tr td {
+                        text-align: left !important;
+                    }
+    
+                    /* Make the dataframe scrollable horizontally if it overflows */
+                    .stDataFrame div {
+                        overflow-x: auto !important;
+                    }
+                </style>
+            """, unsafe_allow_html=True)
 
-                col1, col2, col3 = st.columns(3)
+            email_options = df['email'].tolist()  # Get all emails
+            email_options.insert(0, "Select")  # Add "Select" as the first option
 
-                # Display ID and Role
-                with col1:
-                    st.write(f"Selected ID: {selected_id}")
-                with col2:
-                    st.write(f"Selected Role: {selected_role}")
+            selected_email = st.selectbox("Select an Email", email_options, key="email_selectbox")
 
-                with col3:
-                    if st.button("Disable Record"):
-                        # Example UPDATE query (updating data)
-                        update_query = "UPDATE users SET verified = %s WHERE email = %s"
-                        update_params = ('2', selected_email)
-                        db.update_data(update_query, update_params)
+            if selected_email != "Select":
 
-                        # SELECT query to verify data
-                        select_query = "SELECT * FROM users WHERE email = %s"
-                        params = (selected_email,)
-                        result = db.fetch_data(select_query, params)
+                selected_row = df[df['email'] == selected_email].iloc[0]  # Get the row corresponding to the selected email
+                selected_id = selected_row['id']
+                selected_role = selected_row['role']
 
-                        if result[0]['email'] == selected_email and result[0]['verified'] == 2 :
-                            st.success(f"Account disabled successful!")
-                            time.sleep(2)
+                if selected_role != "Admin":
+                    st.markdown("""
+                    <style>
+                    div.stButton > button:first-child {
+                        background-color: #FF0000; /* red color */
+                        color: white; /* Text color */
+                    }
+                    </style>""", unsafe_allow_html=True)
 
-                        st.rerun()
+                    col1, col2, col3 = st.columns(3)
 
-        st.text("Active User List")
-        st.dataframe(df, height=300)
+                    # Display ID and Role
+                    with col1:
+                        st.write(f"Selected ID: {selected_id}")
+                    with col2:
+                        st.write(f"Selected Role: {selected_role}")
+
+                    with col3:
+                        if st.button("Disable Record"):
+                            # Example UPDATE query (updating data)
+                            update_query = "UPDATE users SET verified = %s WHERE email = %s"
+                            update_params = ('2', selected_email)
+                            db.update_data(update_query, update_params)
+
+                            # SELECT query to verify data
+                            select_query = "SELECT * FROM users WHERE email = %s"
+                            params = (selected_email,)
+                            result = db.fetch_data(select_query, params)
+
+                            if result[0]['email'] == selected_email and result[0]['verified'] == 2 :
+                                st.success(f"Account disabled successful!")
+                                time.sleep(2)
+
+                            st.rerun()
+
+            st.text("Active User List")
+            st.dataframe(df, height=300)
+        elif option_1 == "Pending Approval":
+            # SELECT query (fetching data)
+            select_query = "SELECT * FROM users WHERE verified = %s"
+            params = ("0",)
+            result = db.fetch_data(select_query, params)
+
+            if len(result)>0:
+                df = pd.DataFrame(result)
+
+                st.markdown("""
+                                <style>
+                                    /* Make column headers bold */
+                                    .dataframe thead th {
+                                        font-weight: bold !important;
+                                        text-align: left !important;
+                                    }
+    
+                                    /* Left-align text in the table cells */
+                                    .dataframe tbody tr th, .dataframe tbody tr td {
+                                        text-align: left !important;
+                                    }
+    
+                                    /* Make the dataframe scrollable horizontally if it overflows */
+                                    .stDataFrame div {
+                                        overflow-x: auto !important;
+                                    }
+                                </style>
+                            """, unsafe_allow_html=True)
+
+                email_options = df['email'].tolist()  # Get all emails
+                email_options.insert(0, "Select")  # Add "Select" as the first option
+
+                selected_email = st.selectbox("Select an Email", email_options, key="email_selectbox")
+
+                if selected_email != "Select":
+
+                    selected_row = df[df['email'] == selected_email].iloc[
+                        0]  # Get the row corresponding to the selected email
+                    selected_id = selected_row['id']
+                    selected_role = selected_row['role']
+
+                    if selected_role != "Admin":
+                        st.markdown("""
+                                    <style>
+                                    div.stButton > button:first-child {
+                                        background-color: #FF0000; /* red color */
+                                        color: white; /* Text color */
+                                    }
+                                    </style>""", unsafe_allow_html=True)
+
+                        col1, col2, col3 = st.columns(3)
+
+                        # Display ID and Role
+                        with col1:
+                            st.write(f"Selected ID: {selected_id}")
+                        with col2:
+                            st.write(f"Selected Role: {selected_role}")
+
+                        with col3:
+                            if st.button("Approve Record"):
+                                # Example UPDATE query (updating data)
+                                update_query = "UPDATE users SET verified = %s WHERE email = %s"
+                                update_params = ('1', selected_email)
+                                db.update_data(update_query, update_params)
+
+                                # SELECT query to verify data
+                                select_query = "SELECT * FROM users WHERE email = %s"
+                                params = (selected_email,)
+                                result = db.fetch_data(select_query, params)
+
+                                if result[0]['email'] == selected_email and result[0]['verified'] == 1:
+                                    st.success(f"Account approved successful!")
+                                    time.sleep(2)
+                                st.rerun()
+
+                st.text("Active User List")
+                st.dataframe(df, height=300)
+            else:
+                st.error("No record found")
 
     else:
         st.write("You need to log in first!")
@@ -357,9 +466,8 @@ def sidebar_navigationQA():
         </style>""", unsafe_allow_html=True)
     # Logout button
     if st.sidebar.button("Logout"):
-        st.session_state['user_role'] = 'Guest'
-        st.session_state['user_name'] = 'Guest User'
-
+        controller.remove("cookie_name")
+        controller.set('cookie_name', "Guest")
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
@@ -381,16 +489,14 @@ def sidebar_navigationAdmin():
         </style>""", unsafe_allow_html=True)
     # Logout button
     if st.sidebar.button("Logout"):
-        st.session_state['user_role'] = 'Guest'
-        st.session_state['user_name'] = 'Guest User'
-
+        controller.remove("cookie_name")
+        controller.set('cookie_name', "Guest")
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
 
 # Main function to control the app flow
 def main():
-
     st.markdown("""
     <style>
     div.stButton > button:first-child {
@@ -399,17 +505,17 @@ def main():
     }
     </style>""", unsafe_allow_html=True)
 
-    # Ensure session state is initialized
-    if 'user_role' not in st.session_state:
-        st.session_state['user_role'] = 'Guest'
-    if 'user_name' not in st.session_state:
-        st.session_state['user_name'] = 'Guest User'
+    # # Ensure session state is initialized
+    # if 'user_role' not in st.session_state:
+    #     st.session_state['user_role'] = 'Guest'
+    # if 'user_name' not in st.session_state:
+    #     st.session_state['user_name'] = 'Guest User'
 
-    if st.session_state['user_role'] == 'Guest':
+    if controller.get('cookie_name') == 'Guest':
+        sidebar_navigation()
+    elif controller.get('cookie_name') == 'QA':
         sidebar_navigationQA()
-    elif st.session_state['user_role'] == 'QA':
-        sidebar_navigationQA()
-    elif st.session_state['user_role'] == 'Admin':
+    elif controller.get('cookie_name') == 'Admin':
         sidebar_navigationAdmin()
 
 
