@@ -22,7 +22,7 @@ db = MySQLDatabase(
         password='mqgWHRyzR1',
         database='sql5801118'
 )
-user_data = {}
+# user_data = {}
 
 # Send registration email to user
 def send_email_user(user, email, password):
@@ -87,14 +87,6 @@ def signup():
     role = st.selectbox("Select Role", ['Select', 'QA', 'Admin'])
     password = st.text_input("Enter your Password", type="password")
     confirm_password = st.text_input("Confirm your Password", type="password")
-
-    st.markdown("""
-                <style>
-                div.stButton > button:first-child {
-                    background-color: #022658; /* French Navy color */
-                    color: white; /* Text color */
-                }
-                </style>""", unsafe_allow_html=True)
 
     if st.button("Signup"):
         if not name or not email or not password or not confirm_password or role == "Select":
@@ -163,15 +155,6 @@ def login():
     email = st.text_input("Enter your Email")
     password = st.text_input("Enter your Password", type="password")
 
-    st.markdown("""
-                <style>
-                div.stButton > button:first-child {
-                    background-color: #022658; /* French Navy color */
-                    color: white; /* Text color */
-                }
-                </style>""", unsafe_allow_html=True)
-
-
     if st.button("Login"):
         if not email or not password:
             st.error("All fields are required!", icon="🚨")
@@ -224,17 +207,79 @@ def login():
 
 # Show homepage before login
 def show_homepage():
+
+    text = "BIG Automation Tool"
+    num_chars = len(text)
+    flashing_html = "".join([
+        f'<span class="flashing-text">{char}</span>' if char != " " else '<span class="flashing-text">&nbsp;</span>'
+        for char in text
+    ])
+    animation_delays = "\n".join(
+        [f".flashing-text:nth-child({i + 1}) {{ animation-delay: {i * 0.2}s; }}" for i in range(num_chars)])
+
+    st.markdown(f"""
+            <style>
+                .flashing-text {{
+                    font-size: 60px;
+                    font-weight: none;
+                    color: navy;  
+                    display: inline-block;
+                    opacity: 1;
+                    animation: flash 1s forwards;
+                }}
+
+                {animation_delays}
+
+                @keyframes flash {{
+                    0% {{ opacity: 1; }}
+                    50% {{ opacity: 0; }}
+                    100% {{ opacity: 1; }}
+                }}
+            </style>
+        """, unsafe_allow_html=True)
+    st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
+
     st.title(f"Hi, {controller.get('cookie_name')}!")
-    st.write(f"Your are a guest user. Please signup to explore BIG automation tool.")
+    st.write(f"Please signup to explore features.")
+
 
 # Show homepage after login
 def show_homepageQA():
+    text = "BIG Automation Tool"
+    num_chars = len(text)
+    flashing_html = "".join([
+        f'<span class="flashing-text">{char}</span>' if char != " " else '<span class="flashing-text">&nbsp;</span>'
+        for char in text
+    ])
+    animation_delays = "\n".join(
+        [f".flashing-text:nth-child({i + 1}) {{ animation-delay: {i * 0.2}s; }}" for i in range(num_chars)])
+
+    st.markdown(f"""
+            <style>
+                .flashing-text {{
+                    font-size: 60px;
+                    font-weight: none;
+                    color: navy;  
+                    display: inline-block;
+                    opacity: 1;
+                    animation: flash 1s forwards;
+                }}
+
+                {animation_delays}
+
+                @keyframes flash {{
+                    0% {{ opacity: 1; }}
+                    50% {{ opacity: 0; }}
+                    100% {{ opacity: 1; }}
+                }}
+            </style>
+        """, unsafe_allow_html=True)
+    st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
+
     if controller.get('cookie_name') == "QA":
         userNameFound = controller.get('cookie_name')
         st.title(f"Welcome, {controller.get('cookie_name')}!")
         st.write(f"Your Role: {controller.get('cookie_name')}")
-
-        st.link_button("Go to W3Schools", "https://www.w3schools.com/")
 
         cookie = controller.get('cookie_name')
         st.write(cookie)
@@ -262,6 +307,37 @@ def show_homepageQA():
 
 # Show homepage after login by Admin
 def show_homepageAdmin():
+    text = "BIG Automation Tool"
+    num_chars = len(text)
+    flashing_html = "".join([
+        f'<span class="flashing-text">{char}</span>' if char != " " else '<span class="flashing-text">&nbsp;</span>'
+        for char in text
+    ])
+    animation_delays = "\n".join(
+        [f".flashing-text:nth-child({i + 1}) {{ animation-delay: {i * 0.2}s; }}" for i in range(num_chars)])
+
+    st.markdown(f"""
+            <style>
+                .flashing-text {{
+                    font-size: 60px;
+                    font-weight: none;
+                    color: navy;  
+                    display: inline-block;
+                    opacity: 1;
+                    animation: flash 1s forwards;
+                }}
+
+                {animation_delays}
+
+                @keyframes flash {{
+                    0% {{ opacity: 1; }}
+                    50% {{ opacity: 0; }}
+                    100% {{ opacity: 1; }}
+                }}
+            </style>
+        """, unsafe_allow_html=True)
+    st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
+
     if controller.get('cookie_name') == "Admin":
         st.title(f"Welcome, {controller.get('cookie_name')}!")
         st.write(f"Your Role: {controller.get('cookie_name')}")
@@ -315,13 +391,6 @@ def show_usersAdmin():
                 selected_role = selected_row['role']
 
                 if selected_role != "Admin":
-                    st.markdown("""
-                    <style>
-                    div.stButton > button:first-child {
-                        background-color: #FF0000; /* red color */
-                        color: white; /* Text color */
-                    }
-                    </style>""", unsafe_allow_html=True)
 
                     col1, col2, col3 = st.columns(3)
 
@@ -393,14 +462,6 @@ def show_usersAdmin():
                     selected_role = selected_row['role']
 
                     if selected_role != "Admin":
-                        st.markdown("""
-                                    <style>
-                                    div.stButton > button:first-child {
-                                        background-color: #FF0000; /* red color */
-                                        color: white; /* Text color */
-                                    }
-                                    </style>""", unsafe_allow_html=True)
-
                         col1, col2, col3 = st.columns(3)
 
                         # Display ID and Role
@@ -453,13 +514,6 @@ def sidebar_navigationQA():
     elif page == "My Data":
         st.text("Add a new page here for QA user")
 
-    st.markdown("""
-        <style>
-        div.stButton > button:first-child {
-            background-color: #022658; /* French Navy color */
-            color: white; /* Text color */
-        }
-        </style>""", unsafe_allow_html=True)
     # Logout button
     if st.sidebar.button("Logout"):
         controller.remove("cookie_name")
@@ -476,13 +530,6 @@ def sidebar_navigationAdmin():
     elif page == "All Users":
         show_usersAdmin()
 
-    st.markdown("""
-        <style>
-        div.stButton > button:first-child {
-            background-color: #022658; /* French Navy color */
-            color: white; /* Text color */
-        }
-        </style>""", unsafe_allow_html=True)
     # Logout button
     if st.sidebar.button("Logout"):
         controller.remove("cookie_name")
@@ -493,25 +540,13 @@ def sidebar_navigationAdmin():
 
 # Main function to control the app flow
 def main():
-    # Define the CSS to hide the GitHub icon
-    hide_github_icon = """
-    <style>
-    #GithubIcon {
-        visibility: hidden;
-    }
-    </style>
-    """
-
-    # Inject the CSS into your Streamlit app
-    st.markdown(hide_github_icon, unsafe_allow_html=True)
-
     st.markdown("""
-    <style>
-    div.stButton > button:first-child {
-        background-color: #022658; /* Red color */
-        color: white; /* Text color */
-    }
-    </style>""", unsafe_allow_html=True)
+        <style>
+        div.stButton > button:first-child {
+            background-color: #ff9559; /* French Navy color */
+            color: white; /* Text color */
+        }
+        </style>""", unsafe_allow_html=True)
 
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
