@@ -514,10 +514,10 @@ def main():
     </style>""", unsafe_allow_html=True)
 
     st.text("testing "+ str(controller.get('cookie_name')))
-    #controller.remove("cookie_name")
+    controller.set('cookie_name', "QA")
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
-    elif controller.get('cookie_name') == 'None':
+    elif controller.get('cookie_name') == 'QA':
         sidebar_navigationQA()
     elif controller.get('cookie_name') == 'Admin':
         sidebar_navigationAdmin()
