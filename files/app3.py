@@ -446,13 +446,10 @@ def sidebar_navigation():
         login()
 
 def sidebar_navigationQA():
-
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Choose a page", ["Home", "My Data", "Login"])
+    page = st.sidebar.radio("Choose a page", ["Home", "Learning"])
     if page == "Home":
         show_homepageQA()
-    elif page == "Login":
-        login()
     elif page == "My Data":
         st.text("Add a new page here for QA user")
 
