@@ -218,7 +218,7 @@ def login():
                 cookie = controller.get('cookie_name')
                 st.write(cookie)
 
-                #st.rerun()
+                st.rerun()
 
             db.close()
 
