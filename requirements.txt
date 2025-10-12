@@ -5,3 +5,4 @@ GitPython~=3.1.45
 mysql-connector~=2.2.9
 streamlit-browser-session-storage~=0.0.12
 streamlit-cookies-controller~=0.0.4
+captcha~=0.7.1

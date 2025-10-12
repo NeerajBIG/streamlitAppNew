@@ -1,10 +1,10 @@
-import os, sys
+import sys
 import time
 from os.path import dirname, join, abspath
-
-import pytz
-
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
+
+from files import display_users
+from files.display_users import fetch_sessions
 from streamlit_js_eval import streamlit_js_eval
 import streamlit as st
 import smtplib
@@ -19,6 +19,7 @@ from captcha.image import ImageCaptcha
 import random
 import string
 from io import BytesIO
+import pytz
 
 
 controller = CookieController()
@@ -29,10 +30,6 @@ db = MySQLDatabase(
     database='sql5801118'
 )
 
-
-# user_data = {}
-
-# Send registration email to user
 def send_email_user(user, email, password):
     sender_email = "neeraj1wayitsol@gmail.com"  # Replace with your email
     sender_password = "gwgc ioef ymbx yybo"  # Replace with your email password
@@ -212,18 +209,18 @@ def login():
 
                 else:
                     update_query = """
-                                    UPDATE SessionDetails 
-                                    SET SessionActive = %s, SessionTime = %s 
-                                    WHERE userid = %s
-                                    """
+                    UPDATE SessionDetails 
+                    SET SessionActive = %s, SessionTime = %s 
+                    WHERE userid = %s
+                    """
                     update_params = ('1', current_datetime, result[0]['id'])
                     db.insert_data(update_query, update_params)
 
-                select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
-                params = (result[0]['id'],)
-                resultSessionTable = db.fetch_data(select_query, params)
-                st.text(resultSessionTable)
-                st.text(result)
+                # select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
+                # params = (result[0]['id'],)
+                # resultSessionTable = db.fetch_data(select_query, params)
+                # st.text(resultSessionTable)
+                # st.text(result)
 
                 expires = datetime.now() + timedelta(days=365 * 10)
                 status_placeholder = st.empty()
@@ -359,18 +356,15 @@ def show_homepageAdmin():
 
 def show_usersAdmin():
     if controller.get('role_user') == "Admin":
-        st.text("All User List")
-        db.connect()
+        st.markdown("# Discover All Users")
 
+        db.connect()
         option_1 = st.radio("Choose a user listing", ["All Active", "Pending Approval"])
         if option_1 == "All Active":
-            # SELECT query (fetching data)
             select_query = "SELECT * FROM users WHERE verified = %s"
             params = ("1",)
             result = db.fetch_data(select_query, params)
-
             df = pd.DataFrame(result)
-
             st.markdown("""
                 <style>
                     /* Make column headers bold */
@@ -390,29 +384,20 @@ def show_usersAdmin():
                     }
                 </style>
             """, unsafe_allow_html=True)
-
             email_options = df['email'].tolist()  # Get all emails
             email_options.insert(0, "Select")  # Add "Select" as the first option
-
             selected_email = st.selectbox("Select an Email", email_options, key="email_selectbox")
 
             if selected_email != "Select":
-
-                selected_row = df[df['email'] == selected_email].iloc[
-                    0]  # Get the row corresponding to the selected email
+                selected_row = df[df['email'] == selected_email].iloc[0]
                 selected_id = selected_row['id']
                 selected_role = selected_row['role']
-
                 if selected_role != "Admin":
-
                     col1, col2, col3 = st.columns(3)
-
-                    # Display ID and Role
                     with col1:
                         st.write(f"Selected ID: {selected_id}")
                     with col2:
                         st.write(f"Selected Role: {selected_role}")
-
                     with col3:
                         if st.button("Disable Record"):
                             # Example UPDATE query (updating data)
@@ -428,39 +413,35 @@ def show_usersAdmin():
                             if result[0]['email'] == selected_email and result[0]['verified'] == 2:
                                 st.success(f"Account disabled successful!")
                                 time.sleep(2)
-
                             st.rerun()
-
             st.text("Active User List")
             st.dataframe(df, height=300)
+
         elif option_1 == "Pending Approval":
-            # SELECT query (fetching data)
             select_query = "SELECT * FROM users WHERE verified = %s"
             params = ("0",)
             result = db.fetch_data(select_query, params)
-
             if len(result) > 0:
                 df = pd.DataFrame(result)
-
                 st.markdown("""
-                                <style>
-                                    /* Make column headers bold */
-                                    .dataframe thead th {
-                                        font-weight: bold !important;
-                                        text-align: left !important;
-                                    }
+                    <style>
+                        /* Make column headers bold */
+                        .dataframe thead th {
+                            font-weight: bold !important;
+                            text-align: left !important;
+                        }
 
-                                    /* Left-align text in the table cells */
-                                    .dataframe tbody tr th, .dataframe tbody tr td {
-                                        text-align: left !important;
-                                    }
+                        /* Left-align text in the table cells */
+                        .dataframe tbody tr th, .dataframe tbody tr td {
+                            text-align: left !important;
+                        }
 
-                                    /* Make the dataframe scrollable horizontally if it overflows */
-                                    .stDataFrame div {
-                                        overflow-x: auto !important;
-                                    }
-                                </style>
-                            """, unsafe_allow_html=True)
+                        /* Make the dataframe scrollable horizontally if it overflows */
+                        .stDataFrame div {
+                            overflow-x: auto !important;
+                        }
+                    </style>
+                """, unsafe_allow_html=True)
 
                 email_options = df['email'].tolist()  # Get all emails
                 email_options.insert(0, "Select")  # Add "Select" as the first option
@@ -499,15 +480,33 @@ def show_usersAdmin():
                                     st.success(f"Account approved successful!")
                                     time.sleep(2)
                                 st.rerun()
-
                 st.text("Active User List")
                 st.dataframe(df, height=300)
             else:
                 st.error("No record found")
-
     else:
         st.write("You need to log in first!")
 
+
+def display_session_table():
+    st.title("User Session Dashboard")
+
+    # Fetch the list of sessions (users and their session status)
+    sessions = display_users.fetch_sessions()
+
+    # Displaying the sessions in a table format using Streamlit
+    if sessions:
+        # Create a dataframe for better table representation
+        import pandas as pd
+
+        # Create a dataframe for sessions with 'User ID' and 'Status'
+        session_data = pd.DataFrame(sessions, columns=["User ID", "Status"])
+
+        # Display the dataframe as a table
+        st.write("### User Session Details")
+        st.dataframe(session_data)  # Displays a nice interactive table
+    else:
+        st.error("No session data found in the database.")
 
 # Sidebar navigation
 def sidebar_navigation():
@@ -559,11 +558,13 @@ def sidebar_navigationQA():
 
 def sidebar_navigationAdmin():
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Choose a page", ["Home", "All Users"])
+    page = st.sidebar.radio("Choose a page", ["Home", "All Users", "User Activity"])
     if page == "Home":
         show_homepageAdmin()
     elif page == "All Users":
         show_usersAdmin()
+    elif page == "User Activity":
+        display_session_table()
 
     # Logout button
     if st.sidebar.button("Logout"):
