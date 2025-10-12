@@ -138,25 +138,6 @@ def signup():
                 st.error("This email address is already registered.", icon="🚨")
             db.close()
 
-
-# # Function to store session in browser storage for each user
-# def set_browser_session(user_data):
-#     # Get session storage object
-#     session_storage = SessionStorage()
-#
-#     # Store the user data as an array of sessions (if more than one user logs in)
-#     existing_sessions = session_storage.getItem("active_sessions")
-#
-#     if existing_sessions is None:
-#         existing_sessions = []
-#
-#     # Add the new user's session to the list
-#     existing_sessions.append(user_data)
-#
-#     # Save it back to session storage
-#     session_storage.setItem("active_sessions", existing_sessions)
-
-# Login logic
 def login():
     st.title("Login.")
     email = st.text_input("Enter your Email")
@@ -203,11 +184,11 @@ def login():
                 expires = datetime.now() + timedelta(days=365 * 10)
                 controller.set('role_user', result[0]['role'], expires=expires)
                 controller.set('user_name', result[0]['name'], expires=expires)
+                controller.set('user_id', result[0]['id'], expires=expires)
 
-                #st.rerun()
+                st.rerun()
 
             db.close()
-
 
 # Show homepage before login
 def show_homepage():
@@ -242,7 +223,7 @@ def show_homepage():
         """, unsafe_allow_html=True)
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
-    st.title(f"Hi, {controller.get('cookie_name')}!")
+    st.title(f"Hi, {controller.get('user_name')}!")
     st.write(f"Please signup to explore features.")
 
 
@@ -279,32 +260,10 @@ def show_homepageQA():
         """, unsafe_allow_html=True)
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
-    if controller.get('cookie_name') == "QA":
-        userNameFound = controller.get('cookie_name')
-        st.title(f"Welcome, {controller.get('cookie_name')}!")
-        st.write(f"Your Role: {controller.get('cookie_name')}")
+    if controller.get('role_user') == "QA":
+        st.title(f"Welcome, {controller.get('user_name')}!")
+        st.write(f"Your Role: {controller.get('role_user')}")
 
-        cookie = controller.get('cookie_name')
-        st.write(cookie)
-
-        # set_browser_session(user_data)
-        # session_storage = SessionStorage()
-        # active_sessions = session_storage.getItem("active_sessions")
-        #
-        # if active_sessions:
-        #     # Display info for all active users
-        #     for session in active_sessions:
-        #         st.write(f"Logged in as: {session['name']} (Role: {session['role']})")
-        # else:
-        #     st.write("No active users found.")
-
-        # session_storage = SessionStorage()
-        # data = session_storage.getItem("my_data")
-        # if data is None:
-        #     data = {"name": "Guesta"}
-        #     session_storage.setItem("my_data", data)
-        # session_storage.setItem("my_data", {"name": userNameFound})
-        # st.write(session_storage.getItem("my_data"))
     else:
         st.write("You need to log in first!")
 
@@ -342,16 +301,16 @@ def show_homepageAdmin():
         """, unsafe_allow_html=True)
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
-    if controller.get('cookie_name') == "Admin":
-        st.title(f"Welcome, {controller.get('cookie_name')}!")
-        st.write(f"Your Role: {controller.get('cookie_name')}")
+    if controller.get('role_user') == "Admin":
+        st.title(f"Welcome, {controller.get('user_name')}!")
+        st.write(f"Your Role: {controller.get('role_user')}")
     else:
         st.write("You need to log in first!")
 
 
 # Show users page after login by Admin
 def show_usersAdmin():
-    if controller.get('cookie_name') == "Admin":
+    if controller.get('role_user') == "Admin":
         st.text("All User List")
         db.connect()
 
@@ -526,6 +485,7 @@ def sidebar_navigationQA():
     if st.sidebar.button("Logout"):
         controller.set('user_role', "Guest")
         controller.set('user_name', "Unknown")
+        controller.set('user_id', "Unknown")
         try:
             controller.remove("cookie_name")
         except:
@@ -556,6 +516,7 @@ def sidebar_navigationAdmin():
     if st.sidebar.button("Logout"):
         controller.set('user_role', "Guest")
         controller.set('user_name', "Unknown")
+        controller.set('user_id', "Unknown")
         try:
             controller.remove("cookie_name")
         except:
@@ -591,9 +552,9 @@ def main():
         st.write(cookie1)
         time.sleep(3)
         if str(cookie1) == "None":
-            st.text("hhhhhhksssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
             controller.set('role_user', "Guest")
             controller.set('user_name', "Unknown")
+            controller.set('user_id', "Unknown")
             try:
                 controller.remove("cookie_name")
             except:
