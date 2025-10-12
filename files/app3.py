@@ -573,27 +573,27 @@ def main():
 
     cookie = controller.get('role_user')
     st.write(cookie)
-    if str(cookie) == "None":
-        cookie1 = controller.get('role_user')
-        st.write(cookie1)
-        time.sleep(3)
-        if str(cookie1) == "None":
-            controller.set('role_user', "Guest")
-            controller.set('user_name', "Unknown")
-            controller.set('user_id', "Unknown")
-            try:
-                controller.remove("cookie_name")
-            except:
-                pass
-            try:
-                controller.remove("cookie_name1")
-            except:
-                pass
-
-            try:
-                controller.remove("user_cookie")
-            except:
-                pass
+    # if str(cookie) == "None":
+    #     cookie1 = controller.get('role_user')
+    #     st.write(cookie1)
+    #     time.sleep(3)
+    #     if str(cookie1) == "None":
+    #         controller.set('role_user', "Guest")
+    #         controller.set('user_name', "Unknown")
+    #         controller.set('user_id', "Unknown")
+    #         try:
+    #             controller.remove("cookie_name")
+    #         except:
+    #             pass
+    #         try:
+    #             controller.remove("cookie_name1")
+    #         except:
+    #             pass
+    #
+    #         try:
+    #             controller.remove("user_cookie")
+    #         except:
+    #             pass
     if controller.get('role_user') == 'Guest':
         sidebar_navigation()
     elif controller.get('role_user') == 'QA':
