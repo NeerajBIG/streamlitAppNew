@@ -584,7 +584,7 @@ def main():
         }
         </style>""", unsafe_allow_html=True)
 
-    cookie = controller.get('user_role')
+    cookie = controller.get('role_user')
     if str(cookie) == "None":
         controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
