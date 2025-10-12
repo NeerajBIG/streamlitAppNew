@@ -632,6 +632,9 @@ def main():
     #     controller.set('cookie_name', 'Guest')
     #     controller.set('identity', 'IdentityChanged')
     cookie = controller.get('cookie_name1')
+    st.text(cookie)
+    cookie_value = st.query_params.get("cookieValue", ["default_value"])[0]
+    st.write(f"Current Cookie Value: {cookie_value}")
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
     elif controller.get('cookie_name') == 'QA':
