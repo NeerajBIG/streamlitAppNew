@@ -579,11 +579,11 @@ def main():
     cookie = controller.get('cookie_name1')
     st.text(cookie)
     st.write(controller.getAll())
-    if controller.get('cookie_name') == 'Guest':
+    if controller.get('user_role') == 'Guest':
         sidebar_navigation()
-    elif controller.get('cookie_name') == 'QA':
+    elif controller.get('user_role') == 'QA':
         sidebar_navigationQA()
-    elif controller.get('cookie_name') == 'Admin':
+    elif controller.get('user_role') == 'Admin':
         sidebar_navigationAdmin()
 
 
