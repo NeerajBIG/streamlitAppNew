@@ -562,6 +562,7 @@ def main():
         </style>""", unsafe_allow_html=True)
 
     st.text(controller.getAll())
+    st.text(controller.get('cookie_name'))
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
     elif controller.get('cookie_name') == 'QA':
