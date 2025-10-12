@@ -209,63 +209,6 @@ def login():
                 cookie = controller.get('cookie_name1')
                 st.write(cookie)
 
-                # JavaScript code to set and get cookies
-                cookie_js = """
-                    <script>
-                        // Function to get a cookie value by name
-                        function getCookie(name) {
-                            let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-                            if (match) {
-                                return match[2];
-                            }
-                            return null;
-                        }
-
-                        // Function to set a cookie with an expiration date (10 years)
-                        function setCookie(name, value, days) {
-                            const expires = new Date();
-                            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));  // expires in 'days' days
-                            document.cookie = name + "=" + value + ";expires=" + expires.toUTCString() + ";path=/";
-                        }
-
-                        // Set the cookie if it's not already set
-                        if (!getCookie('user_cookie')) {
-                            setCookie('user_cookie', 'default_value1', 365*10);  // Store cookie for 10 years
-                        }
-
-                        // Set a new cookie value if user changes the input
-                        const inputValue = document.getElementById('cookie_value').value;
-                        if (inputValue) {
-                            setCookie('user_cookie', inputValue, 365*10);
-                        }
-
-                        // Display cookie value in Streamlit
-                        window.parent.postMessage({cookieValue: getCookie('user_cookie')}, "*");
-                    </script>
-                """
-
-                st.text("Here is input")
-                # Display an input field for the user to update the cookie value
-                new_value = st.text_input("Enter new value for the cookie:")
-
-                # If the user has entered a value, update the cookie with this value using the updateCookie function
-                if new_value:
-                    # Inject JavaScript to update the cookie when the input value is provided
-                    update_cookie_js = f"""
-                        <script>
-                            document.getElementById('cookie_value').value = '{new_value}';  // Set the input value
-                            updateCookie();  // Update the cookie
-                        </script>
-                    """
-                    components.html(update_cookie_js, height=0, width=0)
-
-                # Display the current cookie value
-                components.html(cookie_js, height=0, width=0)
-
-                # Retrieve the cookie value using query_params
-                cookie_value = st.query_params.get("cookieValue", ["default_value"])[0]
-                st.write(f"Current Cookie Value: {cookie_value}")
-
                 #st.rerun()
 
             db.close()
@@ -633,8 +576,7 @@ def main():
     #     controller.set('identity', 'IdentityChanged')
     cookie = controller.get('cookie_name1')
     st.text(cookie)
-    cookie_value = st.query_params.get("cookieValue", ["default_value"])[0]
-    st.write(f"Current Cookie Value: {cookie_value}")
+
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
     elif controller.get('cookie_name') == 'QA':
