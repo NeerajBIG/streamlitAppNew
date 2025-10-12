@@ -531,10 +531,10 @@ def sidebar_navigationQA():
     # Logout button
     if st.sidebar.button("Logout"):
         update_query = """
-               UPDATE SessionDetails
-               SET SessionActive = %s
-               WHERE userid = %s
-               """
+           UPDATE SessionDetails
+           SET SessionActive = %s
+           WHERE userid = %s
+           """
         update_params = ('2', controller.get('user_id'))
         db.insert_data(update_query, update_params)
 
