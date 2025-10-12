@@ -618,8 +618,8 @@ def main():
         }
         </style>""", unsafe_allow_html=True)
 
-    st.write(controller.getAll())
-    st.text(controller.get('cookie_name'))
+    # st.write(controller.getAll())
+    # st.text(controller.get('cookie_name'))
 
     cookie_value = st.experimental_get_query_params().get("cookieValue", ["default_value"])[0]
     st.write(f"Current Cookie Value 2 : {cookie_value}")
