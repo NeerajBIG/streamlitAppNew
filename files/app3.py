@@ -207,7 +207,7 @@ def login():
 
 # Show homepage before login
 def show_homepage():
-
+    st.write(controller.get('cookie_name'))
     text = "BIG Automation Tool"
     num_chars = len(text)
     flashing_html = "".join([
