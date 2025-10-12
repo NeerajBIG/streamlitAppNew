@@ -496,7 +496,7 @@ def show_usersAdmin():
 
 # Sidebar navigation
 def sidebar_navigation():
-    st.write(controller.get("cookie_name"))
+    #st.write(controller.get("cookie_name"))
     st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a page", ["Home", "Signup", "Login"])
     if page == "Home":
