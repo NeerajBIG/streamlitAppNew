@@ -185,12 +185,14 @@ def login():
                 time.sleep(1)
                 controller.set('role_user', result[0]['role'], expires=expires)
                 time.sleep(1)
+                st.write("Saving your session....")
                 controller.set('user_name', result[0]['name'], expires=expires)
                 time.sleep(1)
+                st.write("Loading your profile....")
                 controller.set('user_id', result[0]['id'], expires=expires)
                 time.sleep(1)
-
-                #st.rerun()
+                st.write("All set, redirecting....")
+                st.rerun()
 
             db.close()
 
@@ -487,9 +489,9 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        # controller.set('role_user', "Guest")
-        # controller.set('user_name', "Unknown")
-        # controller.set('user_id', "Unknown")
+        controller.set('role_user', "Guest")
+        controller.set('user_name', "Unknown")
+        controller.set('user_id', "Unknown")
         try:
             controller.remove("cookie_name")
         except:
@@ -521,9 +523,9 @@ def sidebar_navigationAdmin():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        # controller.set('role_user', "Guest")
-        # controller.set('user_name', "Unknown")
-        # controller.set('user_id', "Unknown")
+        controller.set('role_user', "Guest")
+        controller.set('user_name', "Unknown")
+        controller.set('user_id', "Unknown")
         try:
             controller.remove("cookie_name")
         except:
