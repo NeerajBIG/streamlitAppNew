@@ -158,7 +158,7 @@ def signup():
 
 # Login logic
 def login():
-    st.title("Login")
+    st.title("Login.")
     email = st.text_input("Enter your Email")
     password = st.text_input("Enter your Password", type="password")
 
@@ -205,8 +205,8 @@ def login():
                 # st.text(result)
 
                 expires = datetime.now() + timedelta(days=365 * 10)
-                controller.set('cookie_name', result[0]['role'], expires=expires)
-                cookie = controller.get('cookie_name')
+                controller.set('cookie_name1', result[0]['role'], expires=expires)
+                cookie = controller.get('cookie_name1')
                 st.write(cookie)
 
                 # JavaScript code to set and get cookies
@@ -629,6 +629,7 @@ def main():
     #     st.text("dskjdddddddddd")
     #     controller.set('cookie_name', 'Guest')
     #     controller.set('identity', 'IdentityChanged')
+    cookie = controller.get('cookie_name1')
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
     elif controller.get('cookie_name') == 'QA':
