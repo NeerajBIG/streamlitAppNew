@@ -215,7 +215,7 @@ def login():
                 datetime_str = resultSessionTable[0]['SessionTime']
                 controller.set('user_sessionTime', str(datetime_str))
 
-                #st.rerun()
+                st.rerun()
 
             db.close()
 
