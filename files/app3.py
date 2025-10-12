@@ -593,9 +593,9 @@ def main():
         sidebar_navigationQA()
     elif controller.get('user_role') == 'Admin':
         sidebar_navigationAdmin()
-    else:
-        st.text("bbbbbbbbbbbbbbbbbbbbbbbbbbb")
-        controller.set('user_role', 'Guest')
+    # else:
+    #     st.text("bbbbbbbbbbbbbbbbbbbbbbbbbbb")
+    #     controller.set('user_role', 'Guest')
 
 if __name__ == '__main__':
     main()
