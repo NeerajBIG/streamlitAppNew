@@ -4,7 +4,6 @@ from os.path import dirname, join, abspath
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 
 from files import display_users
-from files.display_users import fetch_sessions
 from streamlit_js_eval import streamlit_js_eval
 import streamlit as st
 import smtplib
@@ -20,7 +19,7 @@ import random
 import string
 from io import BytesIO
 import pytz
-
+import pandas as pd
 
 controller = CookieController()
 db = MySQLDatabase(
@@ -490,19 +489,10 @@ def show_usersAdmin():
 
 def display_session_table():
     st.title("User Session Dashboard")
-
-    # Fetch the list of sessions (users and their session status)
     sessions = display_users.fetch_sessions()
-
-    # Displaying the sessions in a table format using Streamlit
+    st.write(sessions)
     if sessions:
-        # Create a dataframe for better table representation
-        import pandas as pd
-
-        # Create a dataframe for sessions with 'User ID' and 'Status'
         session_data = pd.DataFrame(sessions, columns=["User ID", "Status"])
-
-        # Display the dataframe as a table
         st.write("### User Session Details")
         st.dataframe(session_data)  # Displays a nice interactive table
     else:
@@ -532,6 +522,16 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
+        update_query = """
+                   UPDATE SessionDetails
+                   SET SessionActive = %s
+                   WHERE userid = %s
+                   """
+        update_params = ('2', controller.get('user_id'))
+        st.text(controller.get('user_id'))
+        st.text(update_params)
+        db.insert_data(update_query, update_params)
+
         controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
         controller.set('user_id', "Unknown")
@@ -568,6 +568,16 @@ def sidebar_navigationAdmin():
 
     # Logout button
     if st.sidebar.button("Logout"):
+        update_query = """
+                   UPDATE SessionDetails
+                   SET SessionActive = %s
+                   WHERE userid = %s
+                   """
+        update_params = ('2', controller.get('user_id'))
+        st.text(controller.get('user_id'))
+        st.text(update_params)
+        db.insert_data(update_query, update_params)
+
         controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
         controller.set('user_id', "Unknown")

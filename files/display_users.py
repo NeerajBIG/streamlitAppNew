@@ -10,26 +10,20 @@ def fetch_sessions():
         password='mqgWHRyzR1',
         database='sql5801118'
     )
-
     cursor = db.cursor()
-
     query = "SELECT userid, SessionActive, SessionTime FROM SessionDetails"
     cursor.execute(query)
-
     sessions = cursor.fetchall()
-
     cursor.close()
     db.close()
-
-    session_info = []
+    session_info_active = []
+    session_info_Inactive = []
     for session in sessions:
-        userid, session_active, session_time = session
-
-        if session_active == 1:
+        userid, SessionActive, SessionTime = session
+        if SessionActive == 1:
             status = "Active"
         else:
-            status = f"Last active on {session_time}"
+            status = f"Last active on {SessionTime}"
+        session_info_active.append((userid, status))
 
-        session_info.append((userid, status))
-
-    return session_info
+    return session_info_active
