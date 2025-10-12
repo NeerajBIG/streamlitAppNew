@@ -586,7 +586,9 @@ def main():
 
     cookie = controller.get('role_user')
     st.write(cookie)
+    time.sleep(3)
     if str(cookie) == "None":
+        st.text("hhhhhhksssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
         controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
         try:
