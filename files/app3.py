@@ -205,10 +205,10 @@ def login():
                 # st.text(result)
 
                 expires = datetime.now() + timedelta(days=365 * 10)
-                controller.set('cookie_name1', result[0]['role'], expires=expires)
+                controller.set('user_role', result[0]['role'], expires=expires)
                 cookie = controller.get('cookie_name1')
-                controller.set('cookie_name', result[0]['role'], expires=expires)
-                cookie = controller.get('cookie_name')
+                # controller.set('cookie_name', result[0]['role'], expires=expires)
+                # cookie = controller.get('cookie_name')
                 st.write(cookie)
 
                 #st.rerun()
