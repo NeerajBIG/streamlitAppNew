@@ -180,7 +180,7 @@ def login():
             elif result[0]['email'] == email and result[0]['verified'] == 1 and result[0]['password'] == password:
                 st.success(f"Login successful! Welcome back, {result[0]['name']}!")
 
-                current_datetime = datetime.now()
+                current_datetime = datetime.utcnow()
                 #st.text(current_datetime)
 
                 check_query = "SELECT COUNT(*) FROM SessionDetails WHERE userid = %s"
