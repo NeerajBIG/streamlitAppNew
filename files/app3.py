@@ -237,14 +237,6 @@ def show_homepage():
     st.title(f"Hi, {controller.get('role_user')}!")
     st.write(f"Please signup to explore features. Login if already signed up.")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Sign Up"):
-            signup()
-    with col2:
-        if st.button("Log In"):
-            login()
-
 # Show homepage after login
 def show_homepageQA():
     text = "BIG Automation Tool"
