@@ -529,7 +529,7 @@ def sidebar_navigationQA():
         SET SessionActive = %s, SessionTime = %s 
         WHERE userid = %s
         """
-        update_params = ('1', current_datetime, controller.get('user_id'))
+        update_params = ('0', current_datetime, controller.get('user_id'))
         db.insert_data(update_query, update_params)
 
         controller.set('role_user', "Guest")
