@@ -563,6 +563,7 @@ def main():
 
     st.text(controller.getAll())
     st.text(controller.get('cookie_name'))
+    st.text(controller.get('identity'))
     if controller.get('identity') == 'None':
         st.text("dskjdddddddddd")
     if controller.get('cookie_name') == 'Guest':
