@@ -494,9 +494,12 @@ def sidebar_navigationQA():
             controller.remove("cookie_name1")
         except:
             pass
-
         try:
             controller.remove("user_cookie")
+        except:
+            pass
+        try:
+            controller.remove("user_role")
         except:
             pass
         st.sidebar.success("You have been logged out!")
@@ -525,9 +528,12 @@ def sidebar_navigationAdmin():
             controller.remove("cookie_name1")
         except:
             pass
-
         try:
             controller.remove("user_cookie")
+        except:
+            pass
+        try:
+            controller.remove("user_role")
         except:
             pass
         st.sidebar.success("You have been logged out!")
