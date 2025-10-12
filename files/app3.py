@@ -1,6 +1,7 @@
 import os, sys
 import time
 from os.path import dirname, join, abspath
+
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 from streamlit_js_eval import streamlit_js_eval
 import streamlit as st
@@ -12,17 +13,18 @@ import re
 import pandas as pd
 from datetime import datetime
 from streamlit_cookies_controller import CookieController
-import pytz
-
 
 controller = CookieController()
 
 db = MySQLDatabase(
-        host='sql5.freesqldatabase.com',
-        user='sql5801118',
-        password='mqgWHRyzR1',
-        database='sql5801118'
+    host='sql5.freesqldatabase.com',
+    user='sql5801118',
+    password='mqgWHRyzR1',
+    database='sql5801118'
 )
+
+
+# user_data = {}
 
 # Send registration email to user
 def send_email_user(user, email, password):
@@ -51,6 +53,7 @@ def send_email_user(user, email, password):
     except Exception as e:
         st.error(f"Error sending email: {e}")
 
+
 # Send registration email
 def send_email_admin(user, email, password):
     sender_email = "neeraj1wayitsol@gmail.com"  # Replace with your email
@@ -77,6 +80,7 @@ def send_email_admin(user, email, password):
         server.quit()
     except Exception as e:
         st.error(f"Error sending email: {e}")
+
 
 # Signup logic
 def signup():
@@ -121,7 +125,8 @@ def signup():
                 if len(result) == 0:
                     st.error("Signup failed! You will receive signup details once verified.", icon="🚨")
                 elif len(result) == 1:
-                    st.success(f"Signup successful! You will receive confirmation email once approved by admin. Thanks {result[0]['name']}!")
+                    st.success(
+                        f"Signup successful! You will receive confirmation email once approved by admin. Thanks {result[0]['name']}!")
 
                     st.text("Send Email to Admin")
                     send_email_user(name, email, password)  # Send registration email
@@ -131,6 +136,7 @@ def signup():
             else:
                 st.error("This email address is already registered.", icon="🚨")
             db.close()
+
 
 # # Function to store session in browser storage for each user
 # def set_browser_session(user_data):
@@ -161,6 +167,7 @@ def login():
         else:
             db.connect()
 
+            # SELECT query (fetching data)
             select_query = "SELECT * FROM users WHERE email = %s"
             params = (email,)
             result = db.fetch_data(select_query, params)
@@ -180,46 +187,30 @@ def login():
             elif result[0]['email'] == email and result[0]['verified'] == 1 and result[0]['password'] == password:
                 st.success(f"Login successful! Welcome back, {result[0]['name']}!")
 
-                local_timezone = pytz.timezone('US/Eastern')
-                current_datetime = datetime.now(local_timezone)
+                # Storing the user's name and role in session state
+                # st.session_state.user_name = result[0]['name']
+                # st.session_state.user_role = result[0]['role']
+
+                current_datetime = datetime.now()
                 st.text(current_datetime)
+                insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
+                insert_params = (result[0]['id'], '1', current_datetime)
+                db.insert_data(insert_query, insert_params)
 
-                check_query = "SELECT COUNT(*) FROM SessionDetails WHERE userid = %s"
-                check_params = (result[0]['id'],)
-                record_exists = db.fetch_data(check_query, check_params)
-
-                if str(record_exists) == "[{'COUNT(*)': 0}]":
-                    insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
-                    insert_params = (result[0]['id'], '1', current_datetime)
-                    db.insert_data(insert_query, insert_params)
-
-                else:
-                    update_query = """
-                    UPDATE SessionDetails 
-                    SET SessionActive = %s, SessionTime = %s 
-                    WHERE userid = %s
-                    """
-                    update_params = ('1', current_datetime, result[0]['id'])
-                    db.insert_data(update_query, update_params)
-
-                select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
-                params = (result[0]['id'],)
-                resultSessionTable = db.fetch_data(select_query, params)
-                st.text(resultSessionTable)
-                st.text(result)
+                # # SELECT query to verify data
+                # select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
+                # params = (result[0]['id'],)
+                # result = db.fetch_data(select_query, params)
+                # st.text(result)
 
                 controller.set('cookie_name', result[0]['role'])
-                controller.set('user_name', result[0]['name'])
-                controller.set('user_role', result[0]['role'])
-                controller.set('user_id', result[0]['id'])
-                controller.set('user_session', resultSessionTable[0]['SessionActive'])
-
-                datetime_str = resultSessionTable[0]['SessionTime']
-                controller.set('user_sessionTime', str(datetime_str))
+                cookie = controller.get('cookie_name')
+                st.write(cookie)
 
                 st.rerun()
 
             db.close()
+
 
 # Show homepage before login
 def show_homepage():
@@ -254,9 +245,8 @@ def show_homepage():
         """, unsafe_allow_html=True)
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
-    st.title(f"Hi, {controller.get('user_role')}!")
-    st.write(f"Please signup to explore features..")
-    st.write(controller.getAll())
+    st.title(f"Hi, {controller.get('cookie_name')}!")
+    st.write(f"Please signup to explore features.")
 
 
 # Show homepage after login
@@ -292,11 +282,12 @@ def show_homepageQA():
         """, unsafe_allow_html=True)
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
-    if controller.get('user_role') == "QA":
-        st.title(f"Welcome, {controller.get('user_name')}!")
-        st.write(f"Your Role: {controller.get('user_role')}")
+    if controller.get('cookie_name') == "QA":
+        userNameFound = controller.get('cookie_name')
+        st.title(f"Welcome, {controller.get('cookie_name')}!")
+        st.write(f"Your Role: {controller.get('cookie_name')}")
 
-        cookie = controller.getAll()
+        cookie = controller.get('cookie_name')
         st.write(cookie)
 
         # set_browser_session(user_data)
@@ -319,6 +310,7 @@ def show_homepageQA():
         # st.write(session_storage.getItem("my_data"))
     else:
         st.write("You need to log in first!")
+
 
 # Show homepage after login by Admin
 def show_homepageAdmin():
@@ -353,15 +345,16 @@ def show_homepageAdmin():
         """, unsafe_allow_html=True)
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
-    if controller.get('user_role') == "Admin":
-        st.title(f"Welcome, {controller.get('user_name')}!")
-        st.write(f"Your Role: {controller.get('user_role')}")
+    if controller.get('cookie_name') == "Admin":
+        st.title(f"Welcome, {controller.get('cookie_name')}!")
+        st.write(f"Your Role: {controller.get('cookie_name')}")
     else:
         st.write("You need to log in first!")
 
+
 # Show users page after login by Admin
 def show_usersAdmin():
-    if controller.get('user_role') == "Admin":
+    if controller.get('cookie_name') == "Admin":
         st.text("All User List")
         db.connect()
 
@@ -381,12 +374,12 @@ def show_usersAdmin():
                         font-weight: bold !important;
                         text-align: left !important;
                     }
-    
+
                     /* Left-align text in the table cells */
                     .dataframe tbody tr th, .dataframe tbody tr td {
                         text-align: left !important;
                     }
-    
+
                     /* Make the dataframe scrollable horizontally if it overflows */
                     .stDataFrame div {
                         overflow-x: auto !important;
@@ -401,7 +394,8 @@ def show_usersAdmin():
 
             if selected_email != "Select":
 
-                selected_row = df[df['email'] == selected_email].iloc[0]  # Get the row corresponding to the selected email
+                selected_row = df[df['email'] == selected_email].iloc[
+                    0]  # Get the row corresponding to the selected email
                 selected_id = selected_row['id']
                 selected_role = selected_row['role']
 
@@ -427,7 +421,7 @@ def show_usersAdmin():
                             params = (selected_email,)
                             result = db.fetch_data(select_query, params)
 
-                            if result[0]['email'] == selected_email and result[0]['verified'] == 2 :
+                            if result[0]['email'] == selected_email and result[0]['verified'] == 2:
                                 st.success(f"Account disabled successful!")
                                 time.sleep(2)
 
@@ -441,7 +435,7 @@ def show_usersAdmin():
             params = ("0",)
             result = db.fetch_data(select_query, params)
 
-            if len(result)>0:
+            if len(result) > 0:
                 df = pd.DataFrame(result)
 
                 st.markdown("""
@@ -451,12 +445,12 @@ def show_usersAdmin():
                                         font-weight: bold !important;
                                         text-align: left !important;
                                     }
-    
+
                                     /* Left-align text in the table cells */
                                     .dataframe tbody tr th, .dataframe tbody tr td {
                                         text-align: left !important;
                                     }
-    
+
                                     /* Make the dataframe scrollable horizontally if it overflows */
                                     .stDataFrame div {
                                         overflow-x: auto !important;
@@ -510,9 +504,10 @@ def show_usersAdmin():
     else:
         st.write("You need to log in first!")
 
+
 # Sidebar navigation
 def sidebar_navigation():
-    st.sidebar.title("Navigation Panel")
+    st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a page", ["Home", "Signup", "Login"])
     if page == "Home":
         show_homepage()
@@ -521,8 +516,9 @@ def sidebar_navigation():
     elif page == "Login":
         login()
 
+
 def sidebar_navigationQA():
-    st.sidebar.title("Navigation Panel")
+    st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a page", ["Home", "Learning"])
     if page == "Home":
         show_homepageQA()
@@ -531,32 +527,15 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        # update_query = """
-        #    UPDATE SessionDetails
-        #    SET SessionActive = %s
-        #    WHERE userid = %s
-        #    """
-        # update_params = ('2', controller.get('user_id'))
-        # st.text(controller.get('user_id'))
-        # st.text(update_params)
-        # db.insert_data(update_query, update_params)
-        #
-        # try:
-        #     controller.remove("cookie_name")
-        # except:
-        #     pass
-        # controller.remove("user_id")
-        # controller.remove("user_session")
-        # controller.remove("user_sessionTime")
-        # controller.set('user_role', "Guest")
-        # controller.set('user_name', "Unknown")
-
+        controller.remove("cookie_name")
+        controller.set('cookie_name', "Guest")
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
 
+
 def sidebar_navigationAdmin():
-    st.sidebar.title("Navigation Panel")
+    st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a page", ["Home", "All Users"])
     if page == "Home":
         show_homepageAdmin()
@@ -565,17 +544,12 @@ def sidebar_navigationAdmin():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        # try:
-        #     controller.remove("cookie_name")
-        # except:
-        #     pass
-        # controller.remove("user_session")
-        # controller.remove("user_sessionTime")
-        # controller.set('user_role', "Guest")
-        # controller.set('user_name', "Unknown")
+        controller.remove("cookie_name")
+        controller.set('cookie_name', "Guest")
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
+
 
 # Main function to control the app flow
 def main():
@@ -587,16 +561,13 @@ def main():
         }
         </style>""", unsafe_allow_html=True)
 
-    if controller.get('user_role') == 'Guest':
+    if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
-    elif controller.get('user_role') == 'QA':
-        st.text("aaaaaaaaaaaaaaaaaaaaa")
+    elif controller.get('cookie_name') == 'QA':
         sidebar_navigationQA()
-    elif controller.get('user_role') == 'Admin':
+    elif controller.get('cookie_name') == 'Admin':
         sidebar_navigationAdmin()
-    # else:
-    #     st.text("bbbbbbbbbbbbbbbbbbbbbbbbbbb")
-    #     controller.set('user_role', 'Guest')
+
 
 if __name__ == '__main__':
     main()
