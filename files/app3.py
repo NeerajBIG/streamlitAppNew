@@ -204,13 +204,14 @@ def login():
                 select_query = "SELECT * FROM users WHERE userid = %s"
                 params = (result[0]['id'],)
                 resultSessionTable = db.fetch_data(select_query, params)
+                st.text(resultSessionTable)
 
                 controller.set('user_name', result[0]['name'])
                 controller.set('user_role', result[0]['role'])
                 controller.set('user_session', resultSessionTable[0]['SessionActive'])
                 controller.set('user_sessionTime', resultSessionTable[0]['SessionTime'])
 
-                st.rerun()
+                #st.rerun()
 
             db.close()
 
