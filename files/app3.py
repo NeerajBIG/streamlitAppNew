@@ -213,14 +213,6 @@ def login():
                 controller.set('user_session', resultSessionTable[0]['SessionActive'])
 
                 datetime_str = resultSessionTable[0]['SessionTime']
-                st.text("111 "+ str(datetime_str))
-                # formatted_str = datetime_str.replace("datetime.datetime(", "").replace(")", "")
-                # st.text("222 "+str(formatted_str))
-                #
-                # sessiondate = datetime(str(formatted_str))
-                # formatted_sessiondate = sessiondate.strftime("%Y-%m-%d %H:%M:%S")
-                # st.text("333 "+ str(formatted_sessiondate))
-
                 controller.set('user_sessionTime', str(datetime_str))
 
                 #st.rerun()
@@ -262,6 +254,7 @@ def show_homepage():
 
     st.title(f"Hi, {controller.get('user_role')}!")
     st.write(f"Please signup to explore features..")
+    st.write(controller.getAll())
 
 
 # Show homepage after login
