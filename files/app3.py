@@ -484,9 +484,12 @@ def sidebar_navigationQA():
     # Logout button
     if st.sidebar.button("Logout"):
         time.sleep(4)
-        controller.set('user_role', "Guest")
-        controller.set('user_name', "Unknown")
-        controller.set('user_id', "Unknown")
+        controller.remove("user_role")
+        controller.remove("user_name")
+        controller.remove("user_id")
+        # controller.set('user_role', "Guest")
+        # controller.set('user_name', "Unknown")
+        # controller.set('user_id', "Unknown")
         try:
             controller.remove("cookie_name")
         except:
@@ -516,9 +519,12 @@ def sidebar_navigationAdmin():
     # Logout button
     if st.sidebar.button("Logout"):
         time.sleep(4)
-        controller.set('user_role', "Guest")
-        controller.set('user_name', "Unknown")
-        controller.set('user_id', "Unknown")
+        controller.remove("user_role")
+        controller.remove("user_name")
+        controller.remove("user_id")
+        # controller.set('user_role', "Guest")
+        # controller.set('user_name', "Unknown")
+        # controller.set('user_id', "Unknown")
         try:
             controller.remove("cookie_name")
         except:
