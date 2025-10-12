@@ -201,7 +201,7 @@ def login():
                     update_params = ('1', current_datetime, result[0]['id'])
                     db.insert_data(update_query, update_params)
 
-                select_query = "SELECT * FROM users WHERE userid = %s"
+                select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
                 params = (result[0]['id'],)
                 resultSessionTable = db.fetch_data(select_query, params)
                 st.text(resultSessionTable)
