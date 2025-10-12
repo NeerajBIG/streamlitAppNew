@@ -486,7 +486,10 @@ def sidebar_navigationQA():
         time.sleep(4)
         controller.remove("user_role")
         controller.remove("user_name")
-        controller.remove("user_id")
+        try:
+            controller.remove("user_id")
+        except:
+            pass
         # controller.set('user_role', "Guest")
         # controller.set('user_name', "Unknown")
         # controller.set('user_id', "Unknown")
@@ -521,7 +524,10 @@ def sidebar_navigationAdmin():
         time.sleep(4)
         controller.remove("user_role")
         controller.remove("user_name")
-        controller.remove("user_id")
+        try:
+            controller.remove("user_id")
+        except:
+            pass
         # controller.set('user_role', "Guest")
         # controller.set('user_name', "Unknown")
         # controller.set('user_id', "Unknown")
