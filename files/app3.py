@@ -198,7 +198,6 @@ def login():
 
                 local_timezone = pytz.timezone('US/Eastern')
                 current_datetime = datetime.now(local_timezone)
-                st.text(current_datetime)
 
                 check_query = "SELECT COUNT(*) FROM SessionDetails WHERE userid = %s"
                 check_params = (result[0]['id'],)
@@ -210,7 +209,6 @@ def login():
                     db.insert_data(insert_query, insert_params)
 
                 else:
-                    #update_query = "UPDATE users SET column1 = %s WHERE column2 = %s"
                     update_query = """
                     UPDATE SessionDetails 
                     SET SessionActive = %s, SessionTime = %s 
@@ -218,12 +216,6 @@ def login():
                     """
                     update_params = ('1', current_datetime, result[0]['id'])
                     db.update_data(update_query, update_params)
-
-                # select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
-                # params = (result[0]['id'],)
-                # resultSessionTable = db.fetch_data(select_query, params)
-                # st.text(resultSessionTable)
-                # st.text(result)
 
                 expires = datetime.now() + timedelta(days=365 * 10)
                 status_placeholder = st.empty()
@@ -403,12 +395,10 @@ def show_usersAdmin():
                         st.write(f"Selected Role: {selected_role}")
                     with col3:
                         if st.button("Disable Record"):
-                            # Example UPDATE query (updating data)
                             update_query = "UPDATE users SET verified = %s WHERE email = %s"
                             update_params = ('2', selected_email)
                             db.update_data(update_query, update_params)
 
-                            # SELECT query to verify data
                             select_query = "SELECT * FROM users WHERE email = %s"
                             params = (selected_email,)
                             result = db.fetch_data(select_query, params)
@@ -493,20 +483,22 @@ def show_usersAdmin():
 
 def display_session_table():
     users = fetch_users_with_status()
-    cols = st.columns(5)
+    rowsItemCount = 5
+    cols = st.columns(rowsItemCount)
     for i, user in enumerate(users):
-        if i % 5 == 0 and i != 0:
-            cols = st.columns(5)
+        if i % rowsItemCount == 0 and i != 0:
+            cols = st.columns(rowsItemCount)
         user_id, name, initials, status = user
         status_color = "green" if "Active" in status else "gray"
-        with cols[i % 5]:
+        with cols[i % rowsItemCount]:
             st.markdown(
                 f"""
-                    <div style="background-color: {status_color}; border-radius: 8px; padding: 1px; text-align: center; position: relative; height: 150px;">
-                        <h3 style="font-size: 24px; margin: 0; padding-top: 5px;">{name}</h3>
-                        <p style="font-size: 12px; margin-top: 5px;">{status}</p>                        
-                    </div>
-                    """, unsafe_allow_html=True)
+                <div style="background-color: {status_color}; border-radius: 8px; padding: 10px; text-align: center; position: relative; height: 150px; margin-bottom: 20px;">
+                    <p style="font-size: 20px; margin-top: 5px; font-weight: bold;">{name}</p>
+                    <p style="font-size: 12px; margin-top: 5px;">{status}</p>                        
+                </div>
+                """, unsafe_allow_html=True)
+
     st.text("")
     if st.button("Refresh"):
         st.rerun()
@@ -572,6 +564,24 @@ def sidebar_navigationQA():
 
 
 def sidebar_navigationAdmin():
+    db.connect()
+
+    local_timezone = pytz.timezone('US/Eastern')
+    current_datetime = datetime.now(local_timezone)
+    select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
+    params = (controller.get('user_id'),)
+    resultSessionTable = db.fetch_data(select_query, params)
+    session_time = resultSessionTable[0]['SessionTime']
+    if session_time.tzinfo is None:
+        session_time = local_timezone.localize(session_time)
+    time_difference = current_datetime - session_time
+    minutes_difference = time_difference.total_seconds() / 60
+
+    st.sidebar.markdown(f"""
+    <div style="background-color: #4CAF50; color: white; padding: 1px 10px; border-radius: 8px; text-align: center; width: 180px; margin: auto;">
+    <h5 style="margin: 10; font-size: 14px;">Active since {minutes_difference:.2f} minutes</h5>
+    </div>
+    """, unsafe_allow_html=True)
     st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a page", ["Home", "All Users", "User Activity"])
     if page == "Home":
@@ -582,10 +592,8 @@ def sidebar_navigationAdmin():
         display_session_table()
 
     # Logout button
-    if st.sidebar.button("Logout"):
-        db.connect()
-        local_timezone = pytz.timezone('US/Eastern')
-        current_datetime = datetime.now(local_timezone)
+    if st.sidebar.button("Logout") or minutes_difference > 60:
+
         update_query = """
         UPDATE SessionDetails 
         SET SessionActive = %s, SessionTime = %s 
