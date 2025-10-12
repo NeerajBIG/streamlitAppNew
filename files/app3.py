@@ -208,6 +208,7 @@ def login():
                 st.text(resultSessionTable)
                 st.text(result)
 
+                controller.set('cookie_name', result[0]['role'])
                 controller.set('user_name', result[0]['name'])
                 controller.set('user_role', result[0]['role'])
                 controller.set('user_id', result[0]['id'])
