@@ -530,7 +530,7 @@ def sidebar_navigationQA():
         WHERE userid = %s
         """
         update_params = ('0', current_datetime, controller.get('user_id'))
-        db.insert_data(update_query, update_params)
+        db.update_data(update_query, update_params)
 
         controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
