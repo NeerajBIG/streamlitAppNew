@@ -530,19 +530,19 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        # update_query = """
-        #        UPDATE SessionDetails
-        #        SET SessionActive = %s
-        #        WHERE userid = %s
-        #        """
-        # update_params = ('2', controller.get('user_id'))
-        # db.insert_data(update_query, update_params)
+        update_query = """
+               UPDATE SessionDetails
+               SET SessionActive = %s
+               WHERE userid = %s
+               """
+        update_params = ('2', controller.get('user_id'))
+        db.insert_data(update_query, update_params)
 
         try:
             controller.remove("cookie_name")
         except:
             pass
-        #controller.remove("user_id")
+        controller.remove("user_id")
         controller.remove("user_session")
         controller.remove("user_sessionTime")
         controller.set('user_role', "Guest")
