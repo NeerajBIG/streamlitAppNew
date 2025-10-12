@@ -205,6 +205,7 @@ def login():
                 params = (result[0]['id'],)
                 resultSessionTable = db.fetch_data(select_query, params)
                 st.text(resultSessionTable)
+                st.text(result)
 
                 controller.set('user_name', result[0]['name'])
                 controller.set('user_role', result[0]['role'])
