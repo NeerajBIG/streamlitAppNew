@@ -212,7 +212,7 @@ def login():
                 controller.set('user_role', result[0]['role'])
                 controller.set('user_session', resultSessionTable[0]['SessionActive'])
 
-                datetime_str = resultSessionTable[0]['SessionActive']
+                datetime_str = resultSessionTable[0]['SessionTime']
                 st.text(datetime_str)
                 formatted_str = datetime_str.replace("datetime.datetime(", "").replace(")", "")
                 st.text(formatted_str)
