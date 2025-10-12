@@ -555,6 +555,7 @@ def main():
         sidebar_navigationAdmin()
     else:
         sidebar_navigation()
+        controller.set('cookie_name', 'Guest')
 
 if __name__ == '__main__':
     main()
