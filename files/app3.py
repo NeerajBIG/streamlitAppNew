@@ -599,8 +599,10 @@ def main():
     #     st.text("dskjdddddddddd")
     #     controller.set('cookie_name', 'Guest')
     #     controller.set('identity', 'IdentityChanged')
-    cookie = controller.get('cookie_name1')
+    cookie = controller.get('user_role')
     st.text(cookie)
+    if str(cookie) == "None":
+        st.text("First time user")
     st.write(controller.getAll())
     if controller.get('user_role') == 'Guest':
         sidebar_navigation()
