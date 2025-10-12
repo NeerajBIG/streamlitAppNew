@@ -1,6 +1,9 @@
 import sys
 import time
 from os.path import dirname, join, abspath
+
+from files.display_users import fetch_users_with_status
+
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 
 from files import display_users
@@ -489,15 +492,24 @@ def show_usersAdmin():
 
 
 def display_session_table():
-    st.title("User Session Dashboard")
-    sessions = display_users.fetch_sessions()
-    st.write(sessions)
-    if sessions:
-        session_data = pd.DataFrame(sessions, columns=["User ID", "Status"])
-        st.write("### User Session Details")
-        st.dataframe(session_data)  # Displays a nice interactive table
-    else:
-        st.error("No session data found in the database.")
+    users = fetch_users_with_status()
+    cols = st.columns(5)
+    for i, user in enumerate(users):
+        if i % 5 == 0 and i != 0:
+            cols = st.columns(5)
+        user_id, name, initials, status = user
+        status_color = "green" if "Active" in status else "gray"
+        with cols[i % 5]:
+            st.markdown(
+                f"""
+                    <div style="background-color: {status_color}; border-radius: 8px; padding: 1px; text-align: center; position: relative; height: 150px;">
+                        <h3 style="font-size: 24px; margin: 0; padding-top: 5px;">{name}</h3>
+                        <p style="font-size: 12px; margin-top: 5px;">{status}</p>                        
+                    </div>
+                    """, unsafe_allow_html=True)
+    st.text("")
+    if st.button("Refresh"):
+        st.rerun()
 
 # Sidebar navigation
 def sidebar_navigation():
@@ -571,15 +583,17 @@ def sidebar_navigationAdmin():
 
     # Logout button
     if st.sidebar.button("Logout"):
+        db.connect()
+        local_timezone = pytz.timezone('US/Eastern')
+        current_datetime = datetime.now(local_timezone)
         update_query = """
-                   UPDATE SessionDetails
-                   SET SessionActive = %s
-                   WHERE userid = %s
-                   """
-        update_params = ('0', controller.get('user_id'))
-        st.text(controller.get('user_id'))
-        st.text(update_params)
-        db.insert_data(update_query, update_params)
+        UPDATE SessionDetails 
+        SET SessionActive = %s, SessionTime = %s 
+        WHERE userid = %s
+        """
+        update_params = ('0', current_datetime, controller.get('user_id'))
+        db.update_data(update_query, update_params)
+        db.close()
 
         controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
