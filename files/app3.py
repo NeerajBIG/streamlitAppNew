@@ -230,7 +230,7 @@ def login():
 
                         // Set the cookie if it's not already set
                         if (!getCookie('user_cookie')) {
-                            setCookie('user_cookie', 'default_value', 365*10);  // Store cookie for 10 years
+                            setCookie('user_cookie', 'default_value1', 365*10);  // Store cookie for 10 years
                         }
 
                         // Set a new cookie value if user changes the input
@@ -246,12 +246,21 @@ def login():
 
                 # Display an input field to change the value of the cookie
                 new_value = st.text_input("Enter new value for the cookie:")
+                if new_value:
+                    # Inject JavaScript to update the cookie when the input value is provided
+                    update_cookie_js = f"""
+                        <script>
+                            document.getElementById('cookie_value').value = '{new_value}';  // Set the input value
+                            updateCookie();  // Update the cookie
+                        </script>
+                    """
+                    components.html(update_cookie_js, height=0, width=0)
 
-                # Display JavaScript in Streamlit to handle cookies
+                # Display the current cookie value
                 components.html(cookie_js, height=0, width=0)
 
                 # Retrieve the cookie value
-                cookie_value = st.experimental_get_query_params().get("cookieValue", ["default_value"])[0]
+                cookie_value = st.query_params().get("cookieValue", ["default_value"])[0]
                 st.write(f"Current Cookie Value: {cookie_value}")
 
                 st.rerun()
