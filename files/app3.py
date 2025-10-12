@@ -566,6 +566,7 @@ def main():
     st.text(controller.get('identity'))
     if str(controller.get('identity')) == 'None':
         st.text("dskjdddddddddd")
+        controller.set('cookie_name', 'Guest')
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
     elif controller.get('cookie_name') == 'QA':
