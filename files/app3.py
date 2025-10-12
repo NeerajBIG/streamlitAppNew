@@ -184,31 +184,32 @@ def login():
                 current_datetime = datetime.now()
                 #st.text(current_datetime)
 
-                # insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
-                # insert_params = (result[0]['id'], '1', current_datetime)
-                # db.insert_data(insert_query, insert_params)
-
                 check_query = "SELECT COUNT(*) FROM SessionDetails WHERE userid = %s"
                 check_params = (result[0]['id'],)
                 record_exists = db.fetch_data(check_query, check_params)
 
                 if str(record_exists) == "[{'COUNT(*)': 0}]":
-                    st.text("Record FOUNDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
-                    update_query = """
-                        UPDATE SessionDetails 
-                        SET SessionActive = %s, SessionTime = %s 
-                        WHERE userid = %s
-                    """
-                    update_params = ('1', current_datetime, result[0]['id'])
-                    db.insert_data(update_query, update_params)
-                else:
                     st.text("NOOOOOOOOOOOOOOOO Record FOUND")
-                    insert_query = """
-                        INSERT INTO SessionDetails (userid, SessionActive, SessionTime)
-                        VALUES (%s, %s, %s)
-                    """
+                    insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
                     insert_params = (result[0]['id'], '1', current_datetime)
                     db.insert_data(insert_query, insert_params)
+
+
+                else:
+                    st.text("Record FOUNDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+                    update_query = """
+                                            UPDATE SessionDetails 
+                                            SET SessionActive = %s, SessionTime = %s 
+                                            WHERE userid = %s
+                                        """
+                    update_params = ('1', current_datetime, result[0]['id'])
+                    db.insert_data(update_query, update_params)
+                    # insert_query = """
+                    #     INSERT INTO SessionDetails (userid, SessionActive, SessionTime)
+                    #     VALUES (%s, %s, %s)
+                    # """
+                    # insert_params = (result[0]['id'], '1', current_datetime)
+                    # db.insert_data(insert_query, insert_params)
 
                 controller.set('cookie_name', result[0]['role'])
                 cookie = controller.get('cookie_name')
