@@ -191,6 +191,7 @@ def login():
                 check_query = "SELECT COUNT(*) FROM SessionDetails WHERE userid = %s"
                 check_params = (result[0]['id'],)
                 record_exists = db.fetch_data(check_query, check_params)
+                st.text(record_exists)
 
                 if record_exists[0] > 0:
                     st.text("Record FOUNDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
