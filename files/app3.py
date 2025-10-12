@@ -483,7 +483,7 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        controller.set('user_role', "Guest")
+        controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
         controller.set('user_id', "Unknown")
         try:
@@ -514,7 +514,7 @@ def sidebar_navigationAdmin():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        controller.set('user_role', "Guest")
+        controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
         controller.set('user_id', "Unknown")
         try:
