@@ -188,21 +188,27 @@ def login():
                 # insert_params = (result[0]['id'], '1', current_datetime)
                 # db.insert_data(insert_query, insert_params)
 
-                insert_query = """
-                    INSERT INTO SessionDetails (userid, SessionActive, SessionTime)
-                    VALUES (%s, %s, %s)
-                    ON DUPLICATE KEY UPDATE 
-                        SessionActive = VALUES(SessionActive), 
-                        SessionTime = VALUES(SessionTime)
-                """
-                insert_params = (result[0]['id'], '1', current_datetime)
-                db.insert_data(insert_query, insert_params)
+                check_query = "SELECT COUNT(*) FROM SessionDetails WHERE userid = %s"
+                check_params = (result[0]['id'],)
+                record_exists = db.fetch_data(check_query, check_params)
 
-                # # SELECT query to verify data
-                # select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
-                # params = (result[0]['id'],)
-                # result = db.fetch_data(select_query, params)
-                # st.text(result)
+                if record_exists[0] > 0:
+                    st.text("Record FOUNDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+                    update_query = """
+                        UPDATE SessionDetails 
+                        SET SessionActive = %s, SessionTime = %s 
+                        WHERE userid = %s
+                    """
+                    update_params = ('1', current_datetime, result[0]['id'])
+                    db.insert_data(update_query, update_params)
+                else:
+                    st.text("NOOOOOOOOOOOOOOOO Record FOUND")
+                    insert_query = """
+                        INSERT INTO SessionDetails (userid, SessionActive, SessionTime)
+                        VALUES (%s, %s, %s)
+                    """
+                    insert_params = (result[0]['id'], '1', current_datetime)
+                    db.insert_data(insert_query, insert_params)
 
                 controller.set('cookie_name', result[0]['role'])
                 cookie = controller.get('cookie_name')

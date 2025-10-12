@@ -59,7 +59,6 @@ class MySQLDatabase:
             cursor = self.connection.cursor()
             cursor.execute(query, params)
             self.connection.commit()
-            #print(f"Query executed successfully. {cursor.rowcount} row(s) affected.")
             cursor.close()
             return f"Query executed successfully. {cursor.rowcount} row(s) affected."
 
