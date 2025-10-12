@@ -562,7 +562,6 @@ def main():
     # st.write(controller.getAll())
     if str(cookie) == "None":
         cookie1 = controller.get('role_user')
-        st.write(cookie1)
         time.sleep(3)
         if str(cookie1) == "None":
             controller.set('role_user', "Guest")
