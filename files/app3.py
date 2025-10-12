@@ -118,6 +118,8 @@ def signup():
 
     user_input = st.text_input('Enter the CAPTCHA text:', key='captcha_input')
 
+    email = email.lower()
+
     if user_input:
         time.sleep(2)
         if user_input == st.session_state.captcha_text:
@@ -180,6 +182,9 @@ def login():
             select_query = "SELECT * FROM users WHERE email = %s"
             params = (email,)
             result = db.fetch_data(select_query, params)
+            st.text(result)
+
+            email = email.lower()
 
             if len(result) == 0:
                 st.error("Login failed! Unknown username or password.", icon="🚨")
