@@ -188,10 +188,6 @@ def login():
             elif result[0]['email'] == email and result[0]['verified'] == 1 and result[0]['password'] == password:
                 st.success(f"Login successful! Welcome back, {result[0]['name']}!")
 
-                # Storing the user's name and role in session state
-                # st.session_state.user_name = result[0]['name']
-                # st.session_state.user_role = result[0]['role']
-
                 current_datetime = datetime.now()
                 st.text(current_datetime)
                 insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
@@ -205,7 +201,7 @@ def login():
                 # st.text(result)
 
                 expires = datetime.now() + timedelta(days=365 * 10)
-                controller.set('user_role', result[0]['role'], expires=expires)
+                controller.set('role_user', result[0]['role'], expires=expires)
                 controller.set('user_name', result[0]['name'], expires=expires)
 
                 #st.rerun()
@@ -588,21 +584,9 @@ def main():
         }
         </style>""", unsafe_allow_html=True)
 
-    # st.write(controller.getAll())
-    # st.text(controller.get('cookie_name'))
-
-    # cookie_value = st.query_params().get("cookieValue", ["default_value"])[0]
-    # st.write(f"Current Cookie Value 2 : {cookie_value}")
-
-    # st.text(controller.get('identity'))
-    # if str(controller.get('identity')) == 'None':
-    #     st.text("dskjdddddddddd")
-    #     controller.set('cookie_name', 'Guest')
-    #     controller.set('identity', 'IdentityChanged')
     cookie = controller.get('user_role')
-    st.text(cookie)
     if str(cookie) == "None":
-        controller.set('user_role', "Guest")
+        controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
         try:
             controller.remove("cookie_name")
@@ -617,14 +601,12 @@ def main():
             controller.remove("user_cookie")
         except:
             pass
-    st.write(controller.getAll())
-    if controller.get('user_role') == 'Guest':
+    if controller.get('role_user') == 'Guest':
         sidebar_navigation()
-    elif controller.get('user_role') == 'QA':
+    elif controller.get('role_user') == 'QA':
         sidebar_navigationQA()
-    elif controller.get('user_role') == 'Admin':
+    elif controller.get('role_user') == 'Admin':
         sidebar_navigationAdmin()
-
 
 if __name__ == '__main__':
     main()
