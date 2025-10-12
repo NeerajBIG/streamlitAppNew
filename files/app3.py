@@ -531,25 +531,25 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        update_query = """
-           UPDATE SessionDetails
-           SET SessionActive = %s
-           WHERE userid = %s
-           """
-        update_params = ('2', controller.get('user_id'))
-        st.text(controller.get('user_id'))
-        st.text(update_params)
-        db.insert_data(update_query, update_params)
-
-        try:
-            controller.remove("cookie_name")
-        except:
-            pass
-        controller.remove("user_id")
-        controller.remove("user_session")
-        controller.remove("user_sessionTime")
-        controller.set('user_role', "Guest")
-        controller.set('user_name', "Unknown")
+        # update_query = """
+        #    UPDATE SessionDetails
+        #    SET SessionActive = %s
+        #    WHERE userid = %s
+        #    """
+        # update_params = ('2', controller.get('user_id'))
+        # st.text(controller.get('user_id'))
+        # st.text(update_params)
+        # db.insert_data(update_query, update_params)
+        #
+        # try:
+        #     controller.remove("cookie_name")
+        # except:
+        #     pass
+        # controller.remove("user_id")
+        # controller.remove("user_session")
+        # controller.remove("user_sessionTime")
+        # controller.set('user_role', "Guest")
+        # controller.set('user_name', "Unknown")
 
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
@@ -565,14 +565,14 @@ def sidebar_navigationAdmin():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        try:
-            controller.remove("cookie_name")
-        except:
-            pass
-        controller.remove("user_session")
-        controller.remove("user_sessionTime")
-        controller.set('user_role', "Guest")
-        controller.set('user_name', "Unknown")
+        # try:
+        #     controller.remove("cookie_name")
+        # except:
+        #     pass
+        # controller.remove("user_session")
+        # controller.remove("user_sessionTime")
+        # controller.set('user_role', "Guest")
+        # controller.set('user_name', "Unknown")
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
