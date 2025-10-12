@@ -536,6 +536,7 @@ def sidebar_navigationQA():
            WHERE userid = %s
            """
         update_params = ('2', controller.get('user_id'))
+        st.text(controller.get('user_id'))
         st.text(update_params)
         db.insert_data(update_query, update_params)
 
