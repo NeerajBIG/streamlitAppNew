@@ -545,7 +545,7 @@ def sidebar_navigationQA():
         st.text("Add a new page here for QA Team")
 
     # Logout button
-    if st.sidebar.button("Logout"):
+    if st.sidebar.button("Logout") or minutes_difference > 60:
         update_query = """
         UPDATE SessionDetails 
         SET SessionActive = %s, SessionTime = %s 
