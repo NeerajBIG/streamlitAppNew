@@ -578,7 +578,7 @@ def main():
     #     controller.set('identity', 'IdentityChanged')
     cookie = controller.get('cookie_name1')
     st.text(cookie)
-
+    st.write(controller.getAll())
     if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
     elif controller.get('cookie_name') == 'QA':
