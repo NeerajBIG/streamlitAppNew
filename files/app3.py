@@ -13,10 +13,13 @@ import re
 import pandas as pd
 from datetime import datetime, timedelta
 from streamlit_cookies_controller import CookieController
-import streamlit.components.v1 as components
+from captcha.image import ImageCaptcha
+import random
+import string
+from io import BytesIO
+
 
 controller = CookieController()
-
 db = MySQLDatabase(
     host='sql5.freesqldatabase.com',
     user='sql5801118',
@@ -71,7 +74,6 @@ def send_email_admin(user, email, password):
 
     msg.attach(MIMEText(body, 'plain'))
 
-    # Set up the server
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
@@ -83,6 +85,15 @@ def send_email_admin(user, email, password):
         st.error(f"Error sending email: {e}")
 
 
+def generate_captcha_text(length=6):
+    characters = string.digits
+    return ''.join(random.choices(characters, k=length))
+
+def generate_captcha_image(text):
+    image_captcha = ImageCaptcha(width=280, height=90, font_sizes=(60,))
+    image = image_captcha.generate_image(text)
+    return image
+
 # Signup logic
 def signup():
     st.title("Signup")
@@ -93,50 +104,66 @@ def signup():
     password = st.text_input("Enter your Password", type="password")
     confirm_password = st.text_input("Confirm your Password", type="password")
 
-    if st.button("Signup"):
-        if not name or not email or not password or not confirm_password or role == "Select":
-            st.error("All fields are required!", icon="🚨")
-        elif bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", email)) != True:
-            st.error("Invalid email address", icon="🚨")
-        elif password != confirm_password:
-            st.error("Passwords do not match.", icon="🚨")
-        else:
-            db.connect()
+    if 'captcha_text' not in st.session_state or 'captcha_image' not in st.session_state or st.button("Reload CAPTCHA"):
+        st.session_state.captcha_text = generate_captcha_text()
+        st.session_state.captcha_image = generate_captcha_image(st.session_state.captcha_text)
+        st.session_state.captcha_input = ''
 
-            # SELECT query (fetching data)
-            select_query = "SELECT * FROM users WHERE email = %s"
-            params = (email,)
-            result = db.fetch_data(select_query, params)
-            time.sleep(2)
-            if len(result) == 0:
-                # INSERT query (inserting data)
-                insert_query = "INSERT INTO users (name, email, role, password, verified) VALUES (%s, %s, %s, %s, %s)"
-                insert_params = (name, email, role, confirm_password, '0')
-                db.insert_data(insert_query, insert_params)
+    captcha_image = st.session_state.captcha_image
+    captcha_bytes = BytesIO()
+    captcha_image.save(captcha_bytes, format='PNG')
+    captcha_bytes.seek(0)
+    st.image(captcha_bytes, caption='CAPTCHA Image', use_container_width=True)
 
-                st.text("Please wait")
+    user_input = st.text_input('Enter the CAPTCHA text:', key='captcha_input')
 
-                time.sleep(5)
+    if user_input:
+        time.sleep(2)
+        if user_input == st.session_state.captcha_text:
+            st.success('CAPTCHA verification successful!')
 
-                # Example SELECT query (fetching data)
-                select_query = "SELECT * FROM users WHERE email = %s"
-                params = (email,)
-                result = db.fetch_data(select_query, params)
+            if st.button("Signup"):
+                if not name or not email or not password or not confirm_password or role == "Select":
+                    st.error("All fields are required!", icon="🚨")
+                elif bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", email)) != True:
+                    st.error("Invalid email address", icon="🚨")
+                elif password != confirm_password:
+                    st.error("Passwords do not match.", icon="🚨")
+                else:
+                    db.connect()
 
-                if len(result) == 0:
-                    st.error("Signup failed! You will receive signup details once verified.", icon="🚨")
-                elif len(result) == 1:
-                    st.success(
-                        f"Signup successful! You will receive confirmation email once approved by admin. Thanks {result[0]['name']}!")
-
-                    st.text("Send Email to Admin")
-                    send_email_user(name, email, password)  # Send registration email
+                    select_query = "SELECT * FROM users WHERE email = %s"
+                    params = (email,)
+                    result = db.fetch_data(select_query, params)
                     time.sleep(2)
+                    if len(result) == 0:
+                        insert_query = "INSERT INTO users (name, email, role, password, verified) VALUES (%s, %s, %s, %s, %s)"
+                        insert_params = (name, email, role, confirm_password, '0')
+                        db.insert_data(insert_query, insert_params)
+                        st.text("Please wait")
 
-                    st.rerun()
-            else:
-                st.error("This email address is already registered.", icon="🚨")
-            db.close()
+                        time.sleep(5)
+
+                        select_query = "SELECT * FROM users WHERE email = %s"
+                        params = (email,)
+                        result = db.fetch_data(select_query, params)
+
+                        if len(result) == 0:
+                            st.error("Signup failed! You will receive signup details once verified.", icon="🚨")
+                        elif len(result) == 1:
+                            st.success(
+                                f"Signup successful! You will receive confirmation email once approved by admin. Thanks {result[0]['name']}!")
+
+                            st.text("Send Email to Admin")
+                            send_email_user(name, email, password)  # Send registration email
+                            time.sleep(2)
+
+                            st.rerun()
+                    else:
+                        st.error("This email address is already registered.", icon="🚨")
+                    db.close()
+        else:
+            st.error('CAPTCHA verification failed. Try again.')
 
 def login():
     st.title("Login.")
@@ -149,7 +176,6 @@ def login():
         else:
             db.connect()
 
-            # SELECT query (fetching data)
             select_query = "SELECT * FROM users WHERE email = %s"
             params = (email,)
             result = db.fetch_data(select_query, params)
@@ -169,17 +195,33 @@ def login():
             elif result[0]['email'] == email and result[0]['verified'] == 1 and result[0]['password'] == password:
                 st.success(f"Login successful! Welcome back, {result[0]['name']}!")
 
-                current_datetime = datetime.now()
+                local_timezone = pytz.timezone('US/Eastern')
+                current_datetime = datetime.now(local_timezone)
                 st.text(current_datetime)
-                insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
-                insert_params = (result[0]['id'], '1', current_datetime)
-                db.insert_data(insert_query, insert_params)
 
-                # # SELECT query to verify data
-                # select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
-                # params = (result[0]['id'],)
-                # result = db.fetch_data(select_query, params)
-                # st.text(result)
+                check_query = "SELECT COUNT(*) FROM SessionDetails WHERE userid = %s"
+                check_params = (result[0]['id'],)
+                record_exists = db.fetch_data(check_query, check_params)
+
+                if str(record_exists) == "[{'COUNT(*)': 0}]":
+                    insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
+                    insert_params = (result[0]['id'], '1', current_datetime)
+                    db.insert_data(insert_query, insert_params)
+
+                else:
+                    update_query = """
+                                    UPDATE SessionDetails 
+                                    SET SessionActive = %s, SessionTime = %s 
+                                    WHERE userid = %s
+                                    """
+                    update_params = ('1', current_datetime, result[0]['id'])
+                    db.insert_data(update_query, update_params)
+
+                select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
+                params = (result[0]['id'],)
+                resultSessionTable = db.fetch_data(select_query, params)
+                st.text(resultSessionTable)
+                st.text(result)
 
                 expires = datetime.now() + timedelta(days=365 * 10)
                 status_placeholder = st.empty()
@@ -198,10 +240,8 @@ def login():
 
                 time.sleep(1)
                 st.rerun()
-
             db.close()
 
-# Show homepage before login
 def show_homepage():
     text = "BIG Automation Tool"
     num_chars = len(text)
@@ -237,7 +277,6 @@ def show_homepage():
     st.title(f"Hi, {controller.get('role_user')}!")
     st.write(f"Sign up to unlock all features, or log in if you already have an account.")
 
-# Show homepage after login
 def show_homepageQA():
     text = "BIG Automation Tool"
     num_chars = len(text)
@@ -278,7 +317,6 @@ def show_homepageQA():
         st.write("You need to log in first!")
 
 
-# Show homepage after login by Admin
 def show_homepageAdmin():
     text = "BIG Automation Tool"
     num_chars = len(text)
@@ -317,8 +355,6 @@ def show_homepageAdmin():
     else:
         st.write("You need to log in first!")
 
-
-# Show users page after login by Admin
 def show_usersAdmin():
     if controller.get('role_user') == "Admin":
         st.text("All User List")
@@ -485,11 +521,13 @@ def sidebar_navigation():
 
 def sidebar_navigationQA():
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Choose a page", ["Home", "Learning"])
+    page = st.sidebar.radio("Choose a page", ["Home", "My Team"])
     if page == "Home":
         show_homepageQA()
-    elif page == "My Data":
+    elif page == "My Space":
         st.text("Add a new page here for QA user")
+    elif page == "My Team":
+        st.text("Add a new page here for QA Team")
 
     # Logout button
     if st.sidebar.button("Logout"):
