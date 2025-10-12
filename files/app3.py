@@ -541,7 +541,7 @@ def sidebar_navigationAdmin():
 # Main function to control the app flow
 def main():
     st.write(controller.get('cookie_name'))
-    st.write(controller.getAll())
+    #st.write(controller.getAll())
     st.markdown("""
         <style>
         div.stButton > button:first-child {
@@ -550,13 +550,14 @@ def main():
         }
         </style>""", unsafe_allow_html=True)
 
-    if controller.get('cookie_name') == 'Guest' or controller.get('cookie_name') == 'None':
+    if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
-    elif controller.get('cookie_name') == 'QA':
+    if controller.get('cookie_name') == 'QA':
         sidebar_navigationQA()
     elif controller.get('cookie_name') == 'Admin':
         sidebar_navigationAdmin()
-
+    else:
+        sidebar_navigation()
 
 if __name__ == '__main__':
     main()
