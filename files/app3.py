@@ -561,7 +561,7 @@ def main():
         }
         </style>""", unsafe_allow_html=True)
 
-    st.text(controller.getAll())
+    st.write(controller.getAll())
     st.text(controller.get('cookie_name'))
     st.text(controller.get('identity'))
     if str(controller.get('identity')) == 'None':
