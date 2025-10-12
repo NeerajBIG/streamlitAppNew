@@ -2,6 +2,8 @@ import os, sys
 import time
 from os.path import dirname, join, abspath
 
+import pytz
+
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 from streamlit_js_eval import streamlit_js_eval
 import streamlit as st
