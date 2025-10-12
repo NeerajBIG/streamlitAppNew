@@ -621,7 +621,7 @@ def main():
     # st.write(controller.getAll())
     # st.text(controller.get('cookie_name'))
 
-    cookie_value = st.experimental_get_query_params().get("cookieValue", ["default_value"])[0]
+    cookie_value = st.query_params().get("cookieValue", ["default_value"])[0]
     st.write(f"Current Cookie Value 2 : {cookie_value}")
 
     # st.text(controller.get('identity'))
