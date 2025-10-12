@@ -13,7 +13,7 @@ import re
 import pandas as pd
 from datetime import datetime, timedelta
 from streamlit_cookies_controller import CookieController
-import pytz
+import streamlit.components.v1 as components
 
 controller = CookieController()
 
@@ -24,6 +24,8 @@ db = MySQLDatabase(
     database='sql5801118'
 )
 
+
+# user_data = {}
 
 # Send registration email to user
 def send_email_user(user, email, password):
@@ -156,7 +158,7 @@ def signup():
 
 # Login logic
 def login():
-    st.title("Login")
+    st.title("Login.")
     email = st.text_input("Enter your Email")
     password = st.text_input("Enter your Password", type="password")
 
@@ -166,6 +168,7 @@ def login():
         else:
             db.connect()
 
+            # SELECT query (fetching data)
             select_query = "SELECT * FROM users WHERE email = %s"
             params = (email,)
             result = db.fetch_data(select_query, params)
@@ -185,46 +188,30 @@ def login():
             elif result[0]['email'] == email and result[0]['verified'] == 1 and result[0]['password'] == password:
                 st.success(f"Login successful! Welcome back, {result[0]['name']}!")
 
-                local_timezone = pytz.timezone('US/Eastern')
-                current_datetime = datetime.now(local_timezone)
+                # Storing the user's name and role in session state
+                # st.session_state.user_name = result[0]['name']
+                # st.session_state.user_role = result[0]['role']
+
+                current_datetime = datetime.now()
                 st.text(current_datetime)
+                insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
+                insert_params = (result[0]['id'], '1', current_datetime)
+                db.insert_data(insert_query, insert_params)
 
-                check_query = "SELECT COUNT(*) FROM SessionDetails WHERE userid = %s"
-                check_params = (result[0]['id'],)
-                record_exists = db.fetch_data(check_query, check_params)
-
-                if str(record_exists) == "[{'COUNT(*)': 0}]":
-                    insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
-                    insert_params = (result[0]['id'], '1', current_datetime)
-                    db.insert_data(insert_query, insert_params)
-
-                else:
-                    update_query = """
-                    UPDATE SessionDetails 
-                    SET SessionActive = %s, SessionTime = %s 
-                    WHERE userid = %s
-                    """
-                    update_params = ('1', current_datetime, result[0]['id'])
-                    db.insert_data(update_query, update_params)
-
-                select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
-                params = (result[0]['id'],)
-                resultSessionTable = db.fetch_data(select_query, params)
-                st.text(resultSessionTable)
-                st.text(result)
+                # # SELECT query to verify data
+                # select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
+                # params = (result[0]['id'],)
+                # result = db.fetch_data(select_query, params)
+                # st.text(result)
 
                 expires = datetime.now() + timedelta(days=365 * 10)
+                controller.set('cookie_name1', result[0]['role'], expires=expires)
+                cookie = controller.get('cookie_name1')
+                controller.set('cookie_name', result[0]['role'], expires=expires)
+                cookie = controller.get('cookie_name')
+                st.write(cookie)
 
-                controller.set('cookie_name', result[0]['role'])
-                controller.set('user_name', result[0]['name'])
-                controller.set('user_role1', result[0]['role'], expires=expires)
-                controller.set('user_id', result[0]['id'])
-                controller.set('user_session', resultSessionTable[0]['SessionActive'])
-
-                datetime_str = resultSessionTable[0]['SessionTime']
-                controller.set('user_sessionTime', str(datetime_str))
-
-                st.rerun()
+                #st.rerun()
 
             db.close()
 
@@ -262,9 +249,8 @@ def show_homepage():
         """, unsafe_allow_html=True)
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
-    st.title(f"Hi, {controller.get('user_role')}!")
-    st.write(f"Please signup to explore features..")
-    st.write(controller.getAll())
+    st.title(f"Hi, {controller.get('cookie_name')}!")
+    st.write(f"Please signup to explore features.")
 
 
 # Show homepage after login
@@ -300,11 +286,12 @@ def show_homepageQA():
         """, unsafe_allow_html=True)
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
-    if controller.get('user_role') == "QA":
-        st.title(f"Welcome, {controller.get('user_name')}!")
-        st.write(f"Your Role: {controller.get('user_role')}")
+    if controller.get('cookie_name') == "QA":
+        userNameFound = controller.get('cookie_name')
+        st.title(f"Welcome, {controller.get('cookie_name')}!")
+        st.write(f"Your Role: {controller.get('cookie_name')}")
 
-        cookie = controller.getAll()
+        cookie = controller.get('cookie_name')
         st.write(cookie)
 
         # set_browser_session(user_data)
@@ -362,16 +349,16 @@ def show_homepageAdmin():
         """, unsafe_allow_html=True)
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
-    if controller.get('user_role') == "Admin":
-        st.title(f"Welcome, {controller.get('user_name')}!")
-        st.write(f"Your Role: {controller.get('user_role')}")
+    if controller.get('cookie_name') == "Admin":
+        st.title(f"Welcome, {controller.get('cookie_name')}!")
+        st.write(f"Your Role: {controller.get('cookie_name')}")
     else:
         st.write("You need to log in first!")
 
 
 # Show users page after login by Admin
 def show_usersAdmin():
-    if controller.get('user_role') == "Admin":
+    if controller.get('cookie_name') == "Admin":
         st.text("All User List")
         db.connect()
 
@@ -524,7 +511,7 @@ def show_usersAdmin():
 
 # Sidebar navigation
 def sidebar_navigation():
-    st.sidebar.title("Navigation Panel")
+    st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a page", ["Home", "Signup", "Login"])
     if page == "Home":
         show_homepage()
@@ -535,7 +522,7 @@ def sidebar_navigation():
 
 
 def sidebar_navigationQA():
-    st.sidebar.title("Navigation Panel")
+    st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a page", ["Home", "Learning"])
     if page == "Home":
         show_homepageQA()
@@ -544,33 +531,15 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        update_query = """
-           UPDATE SessionDetails
-           SET SessionActive = %s
-           WHERE userid = %s
-           """
-        update_params = ('2', controller.get('user_id'))
-        st.text(controller.get('user_id'))
-        st.text(update_params)
-        db.insert_data(update_query, update_params)
-
-        try:
-            controller.remove("cookie_name")
-        except:
-            pass
-        controller.remove("user_id")
-        controller.remove("user_session")
-        controller.remove("user_sessionTime")
-        controller.set('user_role', "Guest")
-        controller.set('user_name', "Unknown")
-
+        controller.remove("cookie_name")
+        controller.set('cookie_name', "Guest")
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
 
 
 def sidebar_navigationAdmin():
-    st.sidebar.title("Navigation Panel")
+    st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a page", ["Home", "All Users"])
     if page == "Home":
         show_homepageAdmin()
@@ -579,14 +548,8 @@ def sidebar_navigationAdmin():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        try:
-            controller.remove("cookie_name")
-        except:
-            pass
-        controller.remove("user_session")
-        controller.remove("user_sessionTime")
-        controller.set('user_role', "Guest")
-        controller.set('user_name', "Unknown")
+        controller.remove("cookie_name")
+        controller.set('cookie_name', "Guest")
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
@@ -602,16 +565,26 @@ def main():
         }
         </style>""", unsafe_allow_html=True)
 
-    if controller.get('user_role') == 'Guest':
+    # st.write(controller.getAll())
+    # st.text(controller.get('cookie_name'))
+
+    # cookie_value = st.query_params().get("cookieValue", ["default_value"])[0]
+    # st.write(f"Current Cookie Value 2 : {cookie_value}")
+
+    # st.text(controller.get('identity'))
+    # if str(controller.get('identity')) == 'None':
+    #     st.text("dskjdddddddddd")
+    #     controller.set('cookie_name', 'Guest')
+    #     controller.set('identity', 'IdentityChanged')
+    cookie = controller.get('cookie_name1')
+    st.text(cookie)
+    st.write(controller.getAll())
+    if controller.get('cookie_name') == 'Guest':
         sidebar_navigation()
-    elif controller.get('user_role') == 'QA':
-        st.text("aaaaaaaaaaaaaaaaaaaaa")
+    elif controller.get('cookie_name') == 'QA':
         sidebar_navigationQA()
-    elif controller.get('user_role') == 'Admin':
+    elif controller.get('cookie_name') == 'Admin':
         sidebar_navigationAdmin()
-    # else:
-    #     st.text("bbbbbbbbbbbbbbbbbbbbbbbbbbb")
-    #     controller.set('user_role', 'Guest')
 
 
 if __name__ == '__main__':
