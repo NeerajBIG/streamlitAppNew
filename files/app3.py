@@ -182,16 +182,21 @@ def login():
                 # st.text(result)
 
                 expires = datetime.now() + timedelta(days=365 * 10)
+                status_placeholder = st.empty()
+
                 time.sleep(1)
                 controller.set('role_user', result[0]['role'], expires=expires)
+                status_placeholder.write("Saving your session....")
+
                 time.sleep(1)
-                st.write("Saving your session....")
                 controller.set('user_name', result[0]['name'], expires=expires)
+                status_placeholder.write("Loading your profile....")
+
                 time.sleep(1)
-                st.write("Loading your profile....")
                 controller.set('user_id', result[0]['id'], expires=expires)
+                status_placeholder.write("All set, redirecting to your profile....")
+
                 time.sleep(1)
-                st.write("All set, redirecting....")
                 st.rerun()
 
             db.close()
