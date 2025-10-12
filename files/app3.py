@@ -206,10 +206,7 @@ def login():
 
                 expires = datetime.now() + timedelta(days=365 * 10)
                 controller.set('user_role', result[0]['role'], expires=expires)
-                cookie = controller.get('cookie_name1')
-                # controller.set('cookie_name', result[0]['role'], expires=expires)
-                # cookie = controller.get('cookie_name')
-                st.write(cookie)
+                controller.set('user_name', result[0]['name'], expires=expires)
 
                 #st.rerun()
 
@@ -535,6 +532,7 @@ def sidebar_navigationQA():
         controller.remove("cookie_name1")
         controller.remove("user_cookie")
         controller.set('user_role', "Guest")
+        controller.set('user_name', "Unknown")
 
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
