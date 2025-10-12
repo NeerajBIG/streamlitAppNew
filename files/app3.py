@@ -213,13 +213,13 @@ def login():
                 controller.set('user_session', resultSessionTable[0]['SessionActive'])
 
                 datetime_str = resultSessionTable[0]['SessionTime']
-                st.text("111 "+datetime_str)
+                st.text("111 "+ str(datetime_str))
                 formatted_str = datetime_str.replace("datetime.datetime(", "").replace(")", "")
-                st.text("222 "+formatted_str)
+                st.text("222 "+str(formatted_str))
 
                 sessiondate = datetime(str(formatted_str))
                 formatted_sessiondate = sessiondate.strftime("%Y-%m-%d %H:%M:%S")
-                st.text("333 "+formatted_sessiondate)
+                st.text("333 "+ str(formatted_sessiondate))
 
                 controller.set('user_sessionTime', formatted_sessiondate)
 
