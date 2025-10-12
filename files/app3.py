@@ -239,7 +239,7 @@ def show_homepage():
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
     st.title(f"Hi, {controller.get('cookie_name')}!")
-    st.write(f"Please signup to explore features.")
+    st.write(f"Please signup to explore features..")
 
 
 # Show homepage after login
