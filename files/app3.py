@@ -182,11 +182,15 @@ def login():
                 # st.text(result)
 
                 expires = datetime.now() + timedelta(days=365 * 10)
+                time.sleep(1)
                 controller.set('role_user', result[0]['role'], expires=expires)
+                time.sleep(1)
                 controller.set('user_name', result[0]['name'], expires=expires)
+                time.sleep(1)
                 controller.set('user_id', result[0]['id'], expires=expires)
+                time.sleep(1)
 
-                st.rerun()
+                #st.rerun()
 
             db.close()
 
