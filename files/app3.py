@@ -244,6 +244,7 @@ def login():
                     </script>
                 """
 
+                st.text("Here is input")
                 # Display an input field to change the value of the cookie
                 new_value = st.text_input("Enter new value for the cookie:")
                 if new_value:
