@@ -211,7 +211,16 @@ def login():
                 controller.set('user_name', result[0]['name'])
                 controller.set('user_role', result[0]['role'])
                 controller.set('user_session', resultSessionTable[0]['SessionActive'])
-                controller.set('user_sessionTime', resultSessionTable[0]['SessionTime'])
+
+                datetime_str = resultSessionTable[0]['SessionActive']
+                formatted_str = datetime_str.replace("datetime.datetime(", "").replace(")", "")
+                st.text(formatted_str)
+
+                sessiondate = datetime(formatted_str)
+                formatted_sessiondate = sessiondate.strftime("%Y-%m-%d %H:%M:%S")
+                st.text(formatted_sessiondate)
+
+                controller.set('user_sessionTime', formatted_sessiondate)
 
                 #st.rerun()
 
