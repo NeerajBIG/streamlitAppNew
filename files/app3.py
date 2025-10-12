@@ -528,12 +528,14 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        controller.remove("cookie_name")
-        controller.remove("cookie_name1")
-        controller.remove("user_cookie")
-        controller.set('user_role', "Guest")
-        controller.set('user_name', "Unknown")
-
+        try:
+            controller.remove("cookie_name")
+            controller.remove("cookie_name1")
+            controller.remove("user_cookie")
+            controller.set('user_role', "Guest")
+            controller.set('user_name', "Unknown")
+        except:
+            pass
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
@@ -549,8 +551,14 @@ def sidebar_navigationAdmin():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        controller.remove("cookie_name")
-        controller.set('cookie_name', "Guest")
+        try:
+            controller.remove("cookie_name")
+            controller.remove("cookie_name1")
+            controller.remove("user_cookie")
+            controller.set('user_role', "Guest")
+            controller.set('user_name', "Unknown")
+        except:
+            pass
         st.sidebar.success("You have been logged out!")
         time.sleep(2)
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
