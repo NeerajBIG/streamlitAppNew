@@ -507,7 +507,7 @@ def sidebar_navigation():
         login()
 
 def sidebar_navigationQA():
-    st.sidebar.title("Navigation")
+    st.sidebar.title("Navigation1")
     page = st.sidebar.radio("Choose a page", ["Home", "Learning"])
     if page == "Home":
         show_homepageQA()
@@ -523,7 +523,7 @@ def sidebar_navigationQA():
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
 
 def sidebar_navigationAdmin():
-    st.sidebar.title("Navigation")
+    st.sidebar.title("Navigation2")
     page = st.sidebar.radio("Choose a page", ["Home", "All Users"])
     if page == "Home":
         show_homepageAdmin()
