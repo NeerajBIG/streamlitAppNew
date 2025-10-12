@@ -602,7 +602,21 @@ def main():
     cookie = controller.get('user_role')
     st.text(cookie)
     if str(cookie) == "None":
-        st.text("First time user")
+        controller.set('user_role', "Guest")
+        controller.set('user_name', "Unknown")
+        try:
+            controller.remove("cookie_name")
+        except:
+            pass
+        try:
+            controller.remove("cookie_name1")
+        except:
+            pass
+
+        try:
+            controller.remove("user_cookie")
+        except:
+            pass
     st.write(controller.getAll())
     if controller.get('user_role') == 'Guest':
         sidebar_navigation()
