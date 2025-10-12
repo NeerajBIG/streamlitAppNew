@@ -523,14 +523,15 @@ def sidebar_navigationQA():
     # Logout button
     if st.sidebar.button("Logout"):
         update_query = """
-                   UPDATE SessionDetails
-                   SET SessionActive = %s
-                   WHERE userid = %s
-                   """
-        update_params = ('2', controller.get('user_id'))
+           UPDATE SessionDetails
+           SET SessionActive = %s
+           WHERE userid = %s
+           """
+        update_params = ('0', controller.get('user_id'))
         st.text(controller.get('user_id'))
         st.text(update_params)
         db.insert_data(update_query, update_params)
+        time.sleep(5)
 
         controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
@@ -573,7 +574,7 @@ def sidebar_navigationAdmin():
                    SET SessionActive = %s
                    WHERE userid = %s
                    """
-        update_params = ('2', controller.get('user_id'))
+        update_params = ('0', controller.get('user_id'))
         st.text(controller.get('user_id'))
         st.text(update_params)
         db.insert_data(update_query, update_params)
