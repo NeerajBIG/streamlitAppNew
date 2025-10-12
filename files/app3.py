@@ -522,16 +522,15 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
+        local_timezone = pytz.timezone('US/Eastern')
+        current_datetime = datetime.now(local_timezone)
         update_query = """
-           UPDATE SessionDetails
-           SET SessionActive = %s
-           WHERE userid = %s
-           """
-        update_params = ('0', controller.get('user_id'))
-        st.text(controller.get('user_id'))
-        st.text(update_params)
+        UPDATE SessionDetails 
+        SET SessionActive = %s, SessionTime = %s 
+        WHERE userid = %s
+        """
+        update_params = ('1', current_datetime, controller.get('user_id'))
         db.insert_data(update_query, update_params)
-        time.sleep(5)
 
         controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
