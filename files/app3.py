@@ -207,13 +207,14 @@ def login():
                     db.insert_data(insert_query, insert_params)
 
                 else:
+                    #update_query = "UPDATE users SET column1 = %s WHERE column2 = %s"
                     update_query = """
                     UPDATE SessionDetails 
                     SET SessionActive = %s, SessionTime = %s 
                     WHERE userid = %s
                     """
                     update_params = ('1', current_datetime, result[0]['id'])
-                    db.insert_data(update_query, update_params)
+                    db.update_data(update_query, update_params)
 
                 # select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
                 # params = (result[0]['id'],)
@@ -522,6 +523,7 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
+        db.connect()
         local_timezone = pytz.timezone('US/Eastern')
         current_datetime = datetime.now(local_timezone)
         update_query = """
@@ -531,6 +533,7 @@ def sidebar_navigationQA():
         """
         update_params = ('0', current_datetime, controller.get('user_id'))
         db.update_data(update_query, update_params)
+        db.close()
 
         controller.set('role_user', "Guest")
         controller.set('user_name', "Unknown")
