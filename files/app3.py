@@ -217,7 +217,7 @@ def login():
                 formatted_str = datetime_str.replace("datetime.datetime(", "").replace(")", "")
                 st.text(formatted_str)
 
-                sessiondate = datetime(formatted_str)
+                sessiondate = datetime(str(formatted_str))
                 formatted_sessiondate = sessiondate.strftime("%Y-%m-%d %H:%M:%S")
                 st.text(formatted_sessiondate)
 
