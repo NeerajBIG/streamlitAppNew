@@ -235,7 +235,7 @@ def show_homepage():
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
     st.title(f"Hi, {controller.get('role_user')}!")
-    st.write(f"Please signup to explore features. Login if already signed up.")
+    st.write(f"Sign up to unlock all features, or log in if you already have an account.")
 
 # Show homepage after login
 def show_homepageQA():
