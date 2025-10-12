@@ -245,8 +245,10 @@ def login():
                 """
 
                 st.text("Here is input")
-                # Display an input field to change the value of the cookie
+                # Display an input field for the user to update the cookie value
                 new_value = st.text_input("Enter new value for the cookie:")
+
+                # If the user has entered a value, update the cookie with this value using the updateCookie function
                 if new_value:
                     # Inject JavaScript to update the cookie when the input value is provided
                     update_cookie_js = f"""
@@ -260,11 +262,11 @@ def login():
                 # Display the current cookie value
                 components.html(cookie_js, height=0, width=0)
 
-                # Retrieve the cookie value
-                cookie_value = st.query_params().get("cookieValue", ["default_value"])[0]
+                # Retrieve the cookie value using query_params
+                cookie_value = st.query_params.get("cookieValue", ["default_value"])[0]
                 st.write(f"Current Cookie Value: {cookie_value}")
 
-                st.rerun()
+                #st.rerun()
 
             db.close()
 
