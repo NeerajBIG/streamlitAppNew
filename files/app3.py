@@ -549,7 +549,7 @@ def main():
         }
         </style>""", unsafe_allow_html=True)
 
-    if controller.get('cookie_name') == 'Guest':
+    if controller.get('cookie_name') == 'Guest' or controller.get('None'):
         sidebar_navigation()
     elif controller.get('cookie_name') == 'QA':
         sidebar_navigationQA()
