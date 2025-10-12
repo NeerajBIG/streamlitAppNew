@@ -484,8 +484,14 @@ def sidebar_navigationQA():
     # Logout button
     if st.sidebar.button("Logout"):
         time.sleep(4)
-        controller.remove("user_role")
-        controller.remove("user_name")
+        try:
+            controller.remove("user_role")
+        except:
+            pass
+        try:
+            controller.remove("user_name")
+        except:
+            pass
         try:
             controller.remove("user_id")
         except:
@@ -522,8 +528,14 @@ def sidebar_navigationAdmin():
     # Logout button
     if st.sidebar.button("Logout"):
         time.sleep(4)
-        controller.remove("user_role")
-        controller.remove("user_name")
+        try:
+            controller.remove("user_role")
+        except:
+            pass
+        try:
+            controller.remove("user_name")
+        except:
+            pass
         try:
             controller.remove("user_id")
         except:
