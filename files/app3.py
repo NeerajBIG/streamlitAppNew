@@ -541,6 +541,7 @@ def sidebar_navigationAdmin():
 # Main function to control the app flow
 def main():
     st.write(controller.get('cookie_name'))
+    st.write(controller.getAll())
     st.markdown("""
         <style>
         div.stButton > button:first-child {
