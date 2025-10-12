@@ -181,13 +181,20 @@ def login():
             elif result[0]['email'] == email and result[0]['verified'] == 1 and result[0]['password'] == password:
                 st.success(f"Login successful! Welcome back, {result[0]['name']}!")
 
-                # Storing the user's name and role in session state
-                # st.session_state.user_name = result[0]['name']
-                # st.session_state.user_role = result[0]['role']
-
                 current_datetime = datetime.now()
-                st.text(current_datetime)
-                insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
+                #st.text(current_datetime)
+
+                # insert_query = "INSERT INTO SessionDetails (userid, SessionActive, SessionTime) VALUES (%s, %s, %s)"
+                # insert_params = (result[0]['id'], '1', current_datetime)
+                # db.insert_data(insert_query, insert_params)
+
+                insert_query = """
+                    INSERT INTO SessionDetails (userid, SessionActive, SessionTime)
+                    VALUES (%s, %s, %s)
+                    ON DUPLICATE KEY UPDATE 
+                        SessionActive = VALUES(SessionActive), 
+                        SessionTime = VALUES(SessionTime)
+                """
                 insert_params = (result[0]['id'], '1', current_datetime)
                 db.insert_data(insert_query, insert_params)
 
@@ -276,7 +283,6 @@ def show_homepageQA():
     st.markdown(f'<p>{flashing_html}</p>', unsafe_allow_html=True)
 
     if controller.get('cookie_name') == "QA":
-        userNameFound = controller.get('cookie_name')
         st.title(f"Welcome, {controller.get('cookie_name')}!")
         st.write(f"Your Role: {controller.get('cookie_name')}")
 
@@ -496,8 +502,7 @@ def show_usersAdmin():
 
 # Sidebar navigation
 def sidebar_navigation():
-    #st.write(controller.get("cookie_name"))
-    st.sidebar.title("Navigation")
+    st.sidebar.title("Navigation Panel")
     page = st.sidebar.radio("Choose a page", ["Home", "Signup", "Login"])
     if page == "Home":
         show_homepage()
@@ -507,7 +512,7 @@ def sidebar_navigation():
         login()
 
 def sidebar_navigationQA():
-    st.sidebar.title("Navigation1")
+    st.sidebar.title("Navigation Panel")
     page = st.sidebar.radio("Choose a page", ["Home", "Learning"])
     if page == "Home":
         show_homepageQA()
@@ -523,7 +528,7 @@ def sidebar_navigationQA():
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
 
 def sidebar_navigationAdmin():
-    st.sidebar.title("Navigation2")
+    st.sidebar.title("Navigation Panel")
     page = st.sidebar.radio("Choose a page", ["Home", "All Users"])
     if page == "Home":
         show_homepageAdmin()
