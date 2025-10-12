@@ -11,7 +11,7 @@ from email.mime.multipart import MIMEMultipart
 from files.mySQLConnector import MySQLDatabase
 import re
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from streamlit_cookies_controller import CookieController
 import pytz
 
@@ -213,9 +213,11 @@ def login():
                 st.text(resultSessionTable)
                 st.text(result)
 
+                expires = datetime.now() + timedelta(days=365 * 10)
+
                 controller.set('cookie_name', result[0]['role'])
                 controller.set('user_name', result[0]['name'])
-                controller.set('user_role', result[0]['role'])
+                controller.set('user_role', result[0]['role'], expires=expires)
                 controller.set('user_id', result[0]['id'])
                 controller.set('user_session', resultSessionTable[0]['SessionActive'])
 
