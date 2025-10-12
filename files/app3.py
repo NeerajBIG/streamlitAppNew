@@ -516,6 +516,25 @@ def sidebar_navigation():
 
 
 def sidebar_navigationQA():
+    db.connect()
+
+    local_timezone = pytz.timezone('US/Eastern')
+    current_datetime = datetime.now(local_timezone)
+    select_query = "SELECT * FROM SessionDetails WHERE userid = %s"
+    params = (controller.get('user_id'),)
+    resultSessionTable = db.fetch_data(select_query, params)
+    session_time = resultSessionTable[0]['SessionTime']
+    if session_time.tzinfo is None:
+        session_time = local_timezone.localize(session_time)
+    time_difference = current_datetime - session_time
+    minutes_difference = time_difference.total_seconds() / 60
+
+    st.sidebar.markdown(f"""
+        <div style="background-color: #4CAF50; color: white; padding: 1px 10px; border-radius: 8px; text-align: center; width: 180px; margin: auto;">
+        <h5 style="margin: 10; font-size: 14px;">Active since {minutes_difference:.2f} minutes</h5>
+        </div>
+        """, unsafe_allow_html=True)
+
     st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a page", ["Home", "My Team"])
     if page == "Home":
@@ -527,9 +546,6 @@ def sidebar_navigationQA():
 
     # Logout button
     if st.sidebar.button("Logout"):
-        db.connect()
-        local_timezone = pytz.timezone('US/Eastern')
-        current_datetime = datetime.now(local_timezone)
         update_query = """
         UPDATE SessionDetails 
         SET SessionActive = %s, SessionTime = %s 
@@ -591,7 +607,6 @@ def sidebar_navigationAdmin():
     elif page == "User Activity":
         display_session_table()
 
-    # Logout button
     if st.sidebar.button("Logout") or minutes_difference > 60:
 
         update_query = """
