@@ -12,9 +12,10 @@ import re
 import pandas as pd
 from datetime import datetime
 from streamlit_cookies_controller import CookieController
+import pytz
+
 
 controller = CookieController()
-
 
 db = MySQLDatabase(
         host='sql5.freesqldatabase.com',
@@ -22,7 +23,6 @@ db = MySQLDatabase(
         password='mqgWHRyzR1',
         database='sql5801118'
 )
-# user_data = {}
 
 # Send registration email to user
 def send_email_user(user, email, password):
@@ -180,8 +180,9 @@ def login():
             elif result[0]['email'] == email and result[0]['verified'] == 1 and result[0]['password'] == password:
                 st.success(f"Login successful! Welcome back, {result[0]['name']}!")
 
-                current_datetime = datetime.utcnow()
-                #st.text(current_datetime)
+                local_timezone = pytz.timezone('US/Eastern')
+                current_datetime = datetime.now(local_timezone)
+                st.text(current_datetime)
 
                 check_query = "SELECT COUNT(*) FROM SessionDetails WHERE userid = %s"
                 check_params = (result[0]['id'],)
