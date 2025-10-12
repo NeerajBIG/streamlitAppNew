@@ -558,8 +558,8 @@ def main():
         </style>""", unsafe_allow_html=True)
 
     cookie = controller.get('role_user')
-    st.write(cookie)
-    st.write(controller.getAll())
+    # st.write(cookie)
+    # st.write(controller.getAll())
     if str(cookie) == "None":
         cookie1 = controller.get('role_user')
         st.write(cookie1)
