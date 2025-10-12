@@ -588,7 +588,7 @@ def main():
 
     if controller.get('user_role') == 'Guest':
         sidebar_navigation()
-    if controller.get('user_role') == 'QA':
+    elif controller.get('user_role') == 'QA':
         st.text("aaaaaaaaaaaaaaaaaaaaa")
         sidebar_navigationQA()
     elif controller.get('user_role') == 'Admin':
