@@ -1,11 +1,9 @@
 import sys
-import time
 from os.path import dirname, join, abspath
-
-from files.display_users import fetch_users_with_status
-
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 
+from display_users import fetch_users_with_status
+import time
 from files import display_users
 from streamlit_js_eval import streamlit_js_eval
 import streamlit as st
